@@ -62,7 +62,7 @@
     "badges": [
         {
             "href": "https://ci.appveyor.com/project/liprec/vsts-release-aas",
-            "uri": "https://ci.appveyor.com/api/projects/status/r7fxpvjh3o6g9p35?svg=true",
+            "uri": "https://ci.appveyor.com/api/projects/status/github/liprec/vsts-release-aas?branch=master&svg=true",
             "description": "Latest AppVeyor build"
         }
     ],
@@ -101,6 +101,14 @@
         },
         {
             "path": "images/logolarge.png",
+            "addressable": true
+        },
+        {
+            "path": "images/screenshot-2.png",
+            "addressable": true
+        },
+        {
+            "path": "images/screenshot-3.png",
             "addressable": true
         }
     ]
