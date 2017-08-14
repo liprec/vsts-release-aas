@@ -107,10 +107,10 @@ Describe "Module: $linkedModule" {
         InModuleScope $linkedModule {
             Context "Remove memberIds from roles" {
                 $jsonModel = '{"name":"TabularModel","model":{"roles":[{"name":"Role","modelPermission":"read","members":[{"memberName":"sample@mail","memberId":"sample@mail","identityProvider":"AzureAD"}]}]}}' | ConvertFrom-Json
-                $model = RemoveSecurityIds -Model $model
+                $model = RemoveSecurityIds -Model $jsonModel
 
                 It "be removed" {
-                    $model.roles[0].members[0].memberId | Should Be $null
+                    $model.model.roles[0].members[0].memberId | Should Be $null
                 }
             }
         }
