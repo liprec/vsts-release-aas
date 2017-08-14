@@ -1,0 +1,106 @@
+{
+    "manifestVersion": 1,
+    "id": "vsts-release-aas",
+    "version": "1.0.0",
+    "name": "Azure Analysis Service",
+    "publisher": "liprec",
+    "galleryFlags": [
+        "Preview"
+    ],
+    "description": "This extension adds release tasks related to Azure Analysis Service: deploy model and execute TSML script",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services.Cloud"
+        }
+    ],
+    "icons": {
+        "default": "images/logo.png",
+        "large": "images/logolarge.png"
+    },
+    "screenshots": [
+        { "path": "images/screenshot-1.png" }
+    ],
+    "categories": [
+        "Build and release"
+    ],
+    "tags": [
+        "azure",
+        "deployment",
+        "aas",
+        "azure analysis service",
+        "analysis service",
+        "tsml"
+    ],
+    "scopes": [
+        "vso.release"
+    ],
+    "branding": {
+        "color": "rgb(87, 32, 31)",
+        "theme": "dark"
+    },
+    "content": {
+        "details": {
+            "path": "README.md"
+        },
+        "license": {
+            "path": "LICENSE"
+        }
+    },
+    "links": {
+        "getstarted": {
+            "uri": "https://github.com/liprec/vsts-release-aas/README.md"
+        },
+        "support": {
+            "uri": "https://github.com/liprec/vsts-release-aas/issues"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/liprec/vsts-release-aas"
+    },
+    "badges": [
+        {
+            "href": "https://ci.appveyor.com/project/liprec/vsts-release-aas",
+            "uri": "https://ci.appveyor.com/api/projects/status/r7fxpvjh3o6g9p35?svg=true",
+            "description": "Latest AppVeyor build"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "deploy-aas-db",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name" : "deploy-aas-db"
+            }
+        },
+        {
+            "id": "execute-aas-tsml",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name" : "execute-aas-tsml"
+            }
+        }
+    ],
+    "files": [
+        {
+            "path": "deploy-aas-db"
+        },
+        {
+            "path": "execute-aas-tsml"
+        },
+        {
+            "path": "images/logo.png",
+            "addressable": true
+        },
+        {
+            "path": "images/logolarge.png",
+            "addressable": true
+        }
+    ]
+}

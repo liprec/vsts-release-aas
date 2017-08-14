@@ -1,0 +1,142 @@
+{
+    "id": "92d41ce5-204b-4284-8caf-9920225e9d01",
+    "name": "execute-aas-tsml",
+    "friendlyName": "Azure Analysis Service TSML Script",
+    "description": "Executes a TSML Script on an Azure Analysis Service instance",
+    "author": "Jan Pieter Posthuma",
+    "helpMarkDown": "[More Information](https://github.com/liprec/vsts-release-aas)",
+    "category": "Deploy",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [
+        "azureps"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
+    },
+    "minimumAgentVersion": "1.95.0",
+    "groups": [
+        {
+            "name": "azure",
+            "displayName": "Azure Details",
+            "isExpanded": true
+        },
+        {
+            "name": "aas",
+            "displayName": "Analysis Service Details",
+            "isExpanded": true
+        },
+        {
+            "name": "deployment",
+            "displayName": "Deployment Details",
+            "isExpanded": true
+        },
+        {
+            "name": "query",
+            "displayName": "Script Details",
+            "isExpanded": true
+        },
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "ConnectedServiceNameSelector",
+            "type": "pickList",
+            "label": "Azure Connection Type",
+            "required": true,
+            "helpMarkDown": "",
+            "defaultValue": "ConnectedServiceNameARM",
+            "options": {
+                "ConnectedServiceNameARM": "Azure Resource Manager"
+            },
+            "groupname": "azure"
+        },
+        {
+            "name": "ConnectedServiceNameARM",
+            "type": "connectedService:AzureRM",
+            "label": "Azure RM Subscription",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Select the Azure Resource Manager subscription.",
+            "groupname": "azure"
+        },
+        {
+            "name": "aasServer",
+            "type": "string",
+            "label": "Analysis Services name",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Azure Analysis Services name, like 'asazure://westeurope.asazure.windows.net/fabrikam'.",
+            "groupname": "aas"
+        },
+        {
+            "name": "modelName",
+            "type": "string",
+            "label": "Model Name",
+            "helpMarkDown": "Name of the Analysis Services Model.",
+            "groupname": "aas"
+        },
+        {
+            "name": "adminName",
+            "type": "string",
+            "label": "Analysis Services Admin",
+            "helpMarkDown": "Specify the Analysis Services admin login",
+            "groupname": "aas"
+        },
+        {
+            "name": "adminPassword",
+            "type": "string",
+            "label": "Analysis Services Admin Password",
+            "helpMarkDown": "Password for the Analysis Services Admin. It can accept variable defined in Build/Release Definitions as '$(passwordVariable)'. You may mark the variable type as 'secret' to secure it.",
+            "groupname": "aas"
+        },
+        {
+            "name": "queryType",
+            "type": "pickList",
+            "label": "Type",
+            "groupname": "query",
+            "options": {
+                "tsml": "TSML Script File",
+                "inline": "Inline TSML Script"
+            }
+        },
+        {
+            "name": "tsmlFile",
+            "type": "filePath",
+            "label": "TSML File",
+            "helpMarkDown": "Location of the TSML file on the automation agent or on a UNC path accessible to the automation agent like, \\\\BudgetIT\\Web\\Deploy\\Fabrikam.tsml. Predefined system variables like, $(agent.releaseDirectory) can also be used here.",
+            "groupname": "query",
+            "visibleRule": "queryType = tsml"
+        },
+        {
+            "name": "tsmlScript",
+            "type": "multiLine",
+            "label": "Inline TSML Script",
+            "helpMarkDown": "Enter the TSML script to execute on the Azure Analysis Service instance selected above.",
+            "groupname": "query",
+            "visibleRule": "queryType = inline"
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "target": "resourceGroupName",
+            "endpointId": "$(ConnectedServiceNameARM)",
+            "dataSourceName": "AzureResourceGroups"
+        }
+    ],
+    "instanceNameFormat": "Execute TSML Script to $(aasServer)",
+    "execution": {
+        "PowerShell3": {
+            "target": "$(currentDirectory)\\execute-aas-tsml.ps1",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}
