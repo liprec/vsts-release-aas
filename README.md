@@ -25,5 +25,5 @@ This release task can be added to a release pipeline to execute a custom TSML sc
 
 ## Release notes
 
-**1.0.0**
+**1.0.1**
 - Initial public release

@@ -1,11 +1,12 @@
 {
     "manifestVersion": 1,
     "id": "vsts-release-aas",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Azure Analysis Service",
-    "publisher": "liprec",
+    "publisher": "liprec",    
     "galleryFlags": [
-        "Preview"
+        "Preview",
+        "Public"
     ],
     "description": "This extension adds release tasks related to Azure Analysis Service: deploy model and execute TSML script",
     "targets": [
