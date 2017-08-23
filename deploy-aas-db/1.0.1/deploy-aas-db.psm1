@@ -96,7 +96,9 @@ General notes
 function RemoveSecurityIds($Model) {
     $roles = $Model.model.roles
     foreach($role in $roles) {
-        $role.members = @(($role.members | Select-Object -Property * -ExcludeProperty memberId))
+        if ($role.members) {
+            $role.members = @(($role.members | Select-Object -Property * -ExcludeProperty memberId))
+        }
     }
     return $Model
 }
