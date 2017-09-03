@@ -72,5 +72,14 @@ if ($result) {
     $result = DeployModel -Server $aasServer -Command $tsmlCommand -Admin $adminName -Password $adminPassword
 }
 
-Write-Host $result
-Write-Host "Deploy database to '$aasServer' complete"
+switch ($result) {
+    0 {
+        Write-Host "Deploy database to '$aasServer' complete"
+    }
+    1 {
+        Write-Host "Deploy database to '$aasServer' complete with warnings"
+    }
+    -1 {
+        Write-Host "Deploy database to '$aasServer' complete with errors"
+    }
+}

@@ -25,5 +25,9 @@ This release task can be added to a release pipeline to execute a custom TSML sc
 
 ## Release notes
 
+**1.1.0**
+- New: AAS return messages (error/warning) are used for the tasks logging
+- Bugfix: Better logging when exceptions are thrown
+
 **1.0.1**
 - Initial public release

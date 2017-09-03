@@ -20,3 +20,12 @@ Script Details:
 - **Type** - Type of how the TSML script is provided: TSML file or inline.
 - **TSML File** - The TSML Script file to be executed
 - **Inline** - TSML Script to be executed
+
+## Release notes
+
+**1.1.0**
+- New: AAS return messages (error/warning) are used for the tasks logging
+- Bugfix: Better logging when exceptions are thrown
+
+**1.0.0**
+- Initial public release

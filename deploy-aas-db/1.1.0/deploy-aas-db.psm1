@@ -1,24 +1,4 @@
 <#
-// Microsoft.AnalysisServices.Tabular.ProviderDataSource   -- (1200)
-- ConnectionsString (Server Database)
-- Account
-- Password
-
-$builder = New-Object System.Data.SqlClient.SqlConnectionStringBuilder -argumentlist "Data Source=database;Initial Catalog=catalog;";
-$builder["Data Source"];
-$builder["Initial Catalog"];
-
-// Microsoft.AnalysisServices.Tabular.StructuredDataSource -- (1400)
-- ConnectionDetails
-	- ConnectionAddress
-		- Server
-		- Database
-- Credential
-	- Username
-	- Password
-#>
-
-<#
 .SYNOPSIS
 Short description
 
@@ -41,10 +21,12 @@ function ReadModel($ModelFile) {
         try {
             return Get-Content $ModelFile | ConvertFrom-Json
         } catch {
-            throw "Not a valid model file (.asdatabase/.bim) provided. ($_.exception.message)"
+            $errMsg = $_.exception.message
+            throw "Not a valid model file (.asdatabase/.bim) provided. ($errMsg)"
         }
     } else {
-        throw "No model file (.asdatabase/.bim) provided. ($_.exception.message)"
+        $errMsg = $_.exception.message
+        throw "No model file (.asdatabase/.bim) provided. ($errMsg)"
     }
 }
 
@@ -178,9 +160,10 @@ function RemoveModel($Server, $ModelName) {
         $tsml = $removeTsml
         $tsml.delete.object.database = $ModelName
         $result = Invoke-ASCmd -Server $Server -Query $tsml
-        return $true
+        return ProcessMessages($result)
     } catch {
-        throw "Error during removing old model. ($_.exception.message)"
+        $errMsg = $_.exception.message
+        throw "Error during deploying the model ($errMsg)"
     }
 }
 
@@ -245,8 +228,55 @@ function DeployModel($Server, $Command, $Admin, [SecureString]$Password) {
     try {
         $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Admin,$Password
         $result = Invoke-ASCmd -Server $Server -Query $Command -Credential $credentials
-        return $result
+        return ProcessMessages($result)
     } catch {
-        throw "Error during deploying the model ($_.exception.message)"
+        $errMsg = $_.exception.message
+        throw "Error during deploying the model ($errMsg)"
     }
+}
+
+<#
+.SYNOPSIS
+Short description
+
+.DESCRIPTION
+Long description
+
+.PARAMETER Server
+Parameter description
+
+.PARAMETER Command
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+General notes
+#>
+function ProcessMessages($result) {
+    $return = 0
+    $resultXml = [Xml]$result
+    $messages = $resultXml.return.root.Messages
+    
+    foreach($message in $messages) {
+        $err = $message.Error
+        if ($err) {
+            $return = -1
+            $errCode = $err.errorcode
+            $errMsg = $err.Description
+            Write-Host "##vso[task.logissue type=error;]Error: $errMsg (ErrorCode: $errCode)"
+        }
+        $warn = $message.Warning
+        if ($warn) {
+            if ($return -eq 0) {
+                $return = 1
+            }
+            $warnCode = $warn.WarningCode
+            $warnMsg = $warn.Description
+            Write-Host "##vso[task.logissue type=warning;]Warning: $warnMsg (WarnCode: $warnCode)"
+        }
+    }
+
+    return $return
 }

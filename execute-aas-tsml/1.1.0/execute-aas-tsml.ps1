@@ -22,7 +22,7 @@ $queryType = Get-VstsInput -Name "queryType" -Require
 $tsmlFile = Get-VstsInput -Name "tsmlFile"
 $tsmlScript = Get-VstsInput -Name "tsmlScript"
 
-$result = ""
+$result = 0
 
 switch ($queryType) {
     "tsml" {
@@ -33,5 +33,14 @@ switch ($queryType) {
     }
 }
 
-Write-Host $result
-Write-Host "Deploy database to '$aasServer' complete"
+switch ($result) {
+    0 {
+        Write-Host "Execute TSML against '$aasServer' complete"
+    }
+    1 {
+        Write-Host "Execute TSML against '$aasServer' complete with warnings"
+    }
+    -1 {
+        Write-Host "Execute TSML against '$aasServer' complete with errors"
+    }
+}

@@ -39,5 +39,9 @@ More configuration will follow. Feel free to contact me for a specific configura
 
 ## Release notes
 
+**1.1.0**
+- New: AAS return messages (error/warning) are used for the tasks logging
+- Bugfix: Better logging when exceptions are thrown
+
 **1.0.0**
 - Initial public release
