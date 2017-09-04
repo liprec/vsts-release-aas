@@ -80,6 +80,7 @@ switch ($result) {
         Write-Host "Deploy database to '$aasServer' complete with warnings"
     }
     -1 {
-        Write-Host "Deploy database to '$aasServer' complete with errors"
+        Write-Error "Deploy database to '$aasServer' complete with errors"
+        throw
     }
 }

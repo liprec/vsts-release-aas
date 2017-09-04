@@ -41,6 +41,7 @@ switch ($result) {
         Write-Host "Execute TSML against '$aasServer' complete with warnings"
     }
     -1 {
-        Write-Host "Execute TSML against '$aasServer' complete with errors"
+        Write-Error "Execute TSML against '$aasServer' complete with errors"
+        throw
     }
 }
