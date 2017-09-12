@@ -39,6 +39,9 @@ More configuration will follow. Feel free to contact me for a specific configura
 
 ## Release notes
 
+**1.1.2**
+- Model files are readed with UTF8 encoding
+
 **1.1.0**
 - New: AAS return messages (error/warning) are used for the tasks logging
 - Bugfix: Better logging when exceptions are thrown

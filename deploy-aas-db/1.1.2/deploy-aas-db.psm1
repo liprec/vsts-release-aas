@@ -19,7 +19,7 @@ function ReadModel($ModelFile) {
                 -and $ModelFile -ne $env:SYSTEM_DEFAULTWORKINGDIRECTORY `
                 -and $ModelFile -ne [String]::Concat($env:SYSTEM_DEFAULTWORKINGDIRECTORY, "\")) {
         try {
-            return Get-Content $ModelFile | ConvertFrom-Json
+            return Get-Content $ModelFile -Encoding UTF8 | ConvertFrom-Json
         } catch {
             $errMsg = $_.exception.message
             throw "Not a valid model file (.asdatabase/.bim) provided. ($errMsg)"
