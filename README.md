@@ -16,14 +16,18 @@ More configuration will follow. Feel free to contact me for a specific configura
 
 [More information](deploy-aas-db/README.md)
 
-## Azure Analysis Service TSML Script
+## Azure Analysis Service TMSL Script
 
-This release task can be added to a release pipeline to execute a custom TSML script against an Azure Analysis Service instance.
+This release task can be added to a release pipeline to execute a custom TMSL script against an Azure Analysis Service instance.
 ![](images/screenshot-3.png)
 
-[More information](execute-aas-tsml/README.md)
+[More information](execute-aas-tmsl/README.md)
 
 ## Release notes
+
+**1.1.3**
+- New: Execute TMSL Script can now have a folder with scripts as input
+- Bugfix: Corrected typo TMSL
 
 **1.1.0**
 - New: AAS return messages (error/warning) are used for the tasks logging

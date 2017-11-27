@@ -1,6 +1,6 @@
 # Azure Analysis Service TSML Script
 
-This release task can be added to a release pipeline to execute a custom TSML script against an Azure Analysis Service instance.
+This release task can be added to a release pipeline to execute a custom TMSL script against an Azure Analysis Service instance.
 ![](images/screenshot-3.png)
 
 ## Parameters
@@ -17,11 +17,16 @@ Analysis Service Details:
 - **Analysis Services Admin Password** - The password of the admin user use to connect to the Azure Analysis Service instance
 
 Script Details:
-- **Type** - Type of how the TSML script is provided: TSML file or inline.
-- **TSML File** - The TSML Script file to be executed
-- **Inline** - TSML Script to be executed
+- **Type** - Type of how the TMSL script is provided: TMSL file or inline.
+- **TMSL File** - The TMSL Script file to be executed
+- **Inline** - TMSL Script to be executed
+- **Folder** - Folder containing TMSL Script files to be executed
 
 ## Release notes
+
+**1.1.2**
+- New: Folder option added as input
+- Bugfix: Replace typo TMSL
 
 **1.1.0**
 - New: AAS return messages (error/warning) are used for the tasks logging

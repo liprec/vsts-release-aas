@@ -1,14 +1,11 @@
 {
     "manifestVersion": 1,
     "id": "vsts-release-aas",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "name": "Azure Analysis Service",
-    "publisher": "liprec",    
-    "galleryFlags": [
-        "Preview",
-        "Public"
-    ],
-    "description": "This extension adds release tasks related to Azure Analysis Service: deploy model and execute TSML script",
+    "publisher": "liprec",
+    "public": true,
+    "description": "This extension adds release tasks related to Azure Analysis Service: deploy model and execute TMSL script",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services.Cloud"
@@ -30,7 +27,7 @@
         "aas",
         "azure analysis service",
         "analysis service",
-        "tsml"
+        "tmsl"
     ],
     "scopes": [
         "vso.release"
@@ -84,7 +81,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name" : "execute-aas-tsml"
+                "name" : "execute-aas-tmsl"
             }
         }
     ],
@@ -93,7 +90,7 @@
             "path": "deploy-aas-db"
         },
         {
-            "path": "execute-aas-tsml"
+            "path": "execute-aas-tmsl"
         },
         {
             "path": "images/logo.png",
