@@ -1,0 +1,232 @@
+{
+    "id": "92d41ce5-204b-4284-8caf-9920225e9d01",
+    "name": "execute-aas-tsml",
+    "friendlyName": "Azure Analysis Service TMSL Script",
+    "description": "Executes a TMSL Script on an Azure Analysis Service instance",
+    "author": "Jan Pieter Posthuma",
+    "helpMarkDown": "[More Information](https://github.com/liprec/vsts-release-aas)",
+    "category": "Deploy",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [
+        "azureps"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "2",
+        "Patch": "0"
+    },
+    "minimumAgentVersion": "1.95.0",
+    "groups": [
+        {
+            "name": "azure",
+            "displayName": "Azure Details",
+            "isExpanded": true
+        },
+        {
+            "name": "aas",
+            "displayName": "Analysis Service Details",
+            "isExpanded": true
+        },
+        {
+            "name": "deployment",
+            "displayName": "Deployment Details",
+            "isExpanded": true
+        },
+        {
+            "name": "query",
+            "displayName": "Script Details",
+            "isExpanded": true
+        },
+        {
+            "name": "firewall",
+            "displayName": "Firewall",
+            "isExpanded": false
+        },
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "ConnectedServiceNameSelector",
+            "type": "pickList",
+            "label": "Azure Connection Type",
+            "required": true,
+            "helpMarkDown": "",
+            "defaultValue": "ConnectedServiceNameARM",
+            "options": {
+                "ConnectedServiceNameARM": "Azure Resource Manager"
+            },
+            "groupname": "azure"
+        },
+        {
+            "name": "ConnectedServiceNameARM",
+            "type": "connectedService:AzureRM",
+            "label": "Azure RM Subscription",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Select the Azure Resource Manager subscription.",
+            "groupname": "azure"
+        },
+        {
+            "name": "aasServer",
+            "type": "string",
+            "label": "Analysis Services name",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Azure Analysis Services name, like 'asazure://westeurope.asazure.windows.net/fabrikam'.",
+            "groupname": "aas"
+        },
+        {
+            "name": "loginType",
+            "type": "pickList",
+            "label": "Login type",
+            "defaultValue": "user",
+            "groupname": "aas",
+            "options": {
+                "user": "Named user",
+                "spn": "Service Principal"
+            }
+        },
+        {
+            "name": "tenantId",
+            "type": "string",
+            "label": "Azure AD TenantID",
+            "required": true,
+            "visibleRule": "loginType = spn",
+            "groupname": "aas"
+        },
+        {
+            "name": "appId",
+            "type": "string",
+            "label": "Application ID",
+            "required": true,
+            "visibleRule": "loginType = spn",
+            "helpMarkDown": "Specify the Application ID of the Service Pricipal",
+            "groupname": "aas"
+        },
+        {
+            "name": "appKey",
+            "type": "string",
+            "label": "Application Key",
+            "required": true,
+            "visibleRule": "loginType = spn",
+            "helpMarkDown": "Key for the Service Principal. It can accept variable defined in Build/Release Definitions as e.g. '$(spkey). You may mark the variable type as 'secret' to secure it.",
+            "groupname": "aas"
+        },
+        {
+            "name": "adminName",
+            "type": "string",
+            "label": "Analysis Services Admin",
+            "required": true,
+            "visibleRule": "loginType = user",
+            "helpMarkDown": "Specify the Analysis Services admin login",
+            "groupname": "aas"
+        },
+        {
+            "name": "adminPassword",
+            "type": "string",
+            "label": "Analysis Services Admin Password",
+            "required": true,
+            "visibleRule": "loginType = user",
+            "helpMarkDown": "Password for the Analysis Services Admin. It can accept variable defined in Build/Release Definitions as e.g. '$(passwordVariable). You may mark the variable type as 'secret' to secure it.",
+            "groupname": "aas"
+        },
+        {
+            "name": "queryType",
+            "type": "pickList",
+            "label": "Type",
+            "groupname": "query",
+            "options": {
+                "tsml": "TMSL Script File",
+                "inline": "Inline TMSL Script",
+                "folder": "Folder with TMSL Files"
+            }
+        },
+        {
+            "name": "tsmlFile",
+            "type": "filePath",
+            "label": "TMSL File",
+            "helpMarkDown": "Location of the TMSL file on the automation agent or on a UNC path accessible to the automation agent like, \\\\BudgetIT\\Web\\Deploy\\Fabrikam.tsml. Predefined system variables like, $(agent.releaseDirectory) can also be used here.",
+            "groupname": "query",
+            "visibleRule": "queryType = tsml"
+        },
+        {
+            "name": "tsmlScript",
+            "type": "multiLine",
+            "label": "Inline TMSL Script",
+            "helpMarkDown": "Enter the TMSL script to execute on the Azure Analysis Service instance selected above.",
+            "groupname": "query",
+            "visibleRule": "queryType = inline"
+        },
+        {
+            "name": "tmslFolder",
+            "type": "filePath",
+            "label": "Path to Folder",
+            "helpMarkDown": "Enter the path to a folder with the TMSL script to needs to be execute on the Azure Analysis Service instance selected above.",
+            "groupname": "query",
+            "visibleRule": "queryType = folder"
+        },
+        {
+            "name": "ipDetectionMethod",
+            "type": "pickList",
+            "label": "Specify Firewall Rules Using",
+            "required": true,
+            "groupName": "firewall",
+            "defaultValue": "autoDetect",
+            "options": {
+                "autoDetect": "Auto Detect",
+                "ipAddressRange": "IP Address Range"
+            },
+            "helpMarkDown": "For successful execution of the task, we need to enable administrators to access the Azure Database for MySQL Server from the IP Address of the automation agent.<br>By selecting auto-detect you can automatically add firewall exception for range of possible IP Address of automation agent ​or else you can specify the range explicitly."
+        },
+        {
+            "name": "startIpAddress",
+            "type": "string",
+            "label": "Start IP Address",
+            "required": true,
+            "groupName": "firewall",
+            "defaultValue": "",
+            "visibleRule": "ipDetectionMethod = ipAddressRange",
+            "helpMarkDown": "The starting IP Address of the automation agent machine pool like 196.21.30.50 ."
+        },
+        {
+            "name": "endIpAddress",
+            "type": "string",
+            "label": "End IP Address",
+            "required": true,
+            "groupName": "firewall",
+            "defaultValue": "",
+            "visibleRule": "ipDetectionMethod = ipAddressRange",
+            "helpMarkDown": "The ending IP Address of the automation agent machine pool like 196.21.30.65 ."
+        },
+        {
+            "name": "deleteFirewallRule",
+            "type": "boolean",
+            "label": "Delete Rule After Task Ends",
+            "required": false,
+            "groupName": "firewall",
+            "defaultValue": "true",
+            "helpMarkDown": "If selected, the added exception for IP addresses of the automation agent will be removed for corresponding Azure Database for MySQL."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "target": "resourceGroupName",
+            "endpointId": "$(ConnectedServiceNameARM)",
+            "dataSourceName": "AzureResourceGroups"
+        }
+    ],
+    "instanceNameFormat": "Execute TMSL Script to $(aasServer)",
+    "execution": {
+        "PowerShell3": {
+            "target": "$(currentDirectory)\\execute-aas-tmsl.ps1",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

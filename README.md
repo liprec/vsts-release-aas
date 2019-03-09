@@ -25,6 +25,10 @@ This release task can be added to a release pipeline to execute a custom TMSL sc
 
 ## Release notes
 
+**1.2.0**
+- Add support for service principal deployments
+- Add support for adding firewall rules
+
 **1.1.3**
 - New: Execute TMSL Script can now have a folder with scripts as input
 - Bugfix: Corrected typo TMSL

@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "vsts-release-aas-preview",
-    "version": "1.1.4",
+    "version": "1.2.0",
     "name": "Azure Analysis Service (Preview)",
     "publisher": "liprec",
     "public": false,
@@ -87,10 +87,10 @@
     ],
     "files": [
         {
-            "path": "deploy-aas-db"
+            "path": "deploy-aas-db/1.2.0"
         },
         {
-            "path": "execute-aas-tmsl"
+            "path": "execute-aas-tmsl/1.2.0"
         },
         {
             "path": "images/logo.png",
