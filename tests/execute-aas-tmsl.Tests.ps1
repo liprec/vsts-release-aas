@@ -1,5 +1,5 @@
 # Set the $version to the 'to be tested' version
-$version = '1.1.2'
+$version = '1.2.0'
 
 # Dynamic set the $testModule to the module file linked to the current test file
 $linkedModule = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace('.Tests.ps1', '')
@@ -43,7 +43,7 @@ Describe "Module: $linkedModule" {
             $Password = ConvertTo-SecureString 'Password' -AsPlainText -Force
 
             Context "Succesfull execute script" {
-                $result = ExecuteScript -Server $Server -Script $Script -Admin $Admin -Password $Password
+                $result = ExecuteScript -Server $Server -Script $Script -LoginType "user" -Identifier $Admin -Secret $Password
 
                 It "No errors" {
                     $result | Should Be $result 0
@@ -54,7 +54,7 @@ Describe "Module: $linkedModule" {
                 $Server = ''
                 
                 It "Should throw exception" {
-                    { $return = ExecuteScript -Server $Server -Script $Script -Admin $Admin -Password $Password } | Should Throw "Error during deploying the model (Error: missing server variable)"
+                    { $return = ExecuteScript -Server $Server -Script $Script -LoginType "user" -Identifier $Admin -Secret $Password } | Should Throw "Error during deploying the model (Error: missing server variable)"
                 }
             }
 
@@ -62,14 +62,14 @@ Describe "Module: $linkedModule" {
                 $Admin = ''
                 
                 It "Should throw exception" {
-                    { $return = ExecuteScript -Server $Server -Script $Script -Admin $Admin -Password $Password } | Should Throw "Error during deploying the model (Error: missing admin variable)"
+                    { $return = ExecuteScript -Server $Server -Script $Script -LoginType "user" -Identifier $Admin -Secret $Password } | Should Throw "Error during deploying the model (Error: missing admin variable)"
                 }
             }
 
             Context "Successfull script call; server returns error" {
                 $Script = '{Error}'
 
-                $return = ExecuteScript -Server $Server -Script $Script -Admin $Admin -Password $Password
+                $return = ExecuteScript -Server $Server -Script $Script -LoginType "user" -Identifier $Admin -Secret $Password
                 
                 It "Returns 1 errors" {
                     $return | Should Be -1
@@ -113,7 +113,7 @@ Describe "Module: $linkedModule" {
             $Password = ConvertTo-SecureString 'Password' -AsPlainText -Force
 
             Context "Succesfull execute script" {
-                $result = ExecuteScriptFile -Server $Server -ScriptFile $ScriptFile -Admin $Admin -Password $Password
+                $result = ExecuteScriptFile -Server $Server -ScriptFile $ScriptFile -LoginType "user" -Identifier $Admin -Secret $Password
 
                 It "No errors" {
                     $result | Should Be $result 0
@@ -124,7 +124,7 @@ Describe "Module: $linkedModule" {
                 $Server = ''
                 
                 It "Should throw exception" {
-                    { $return = ExecuteScriptFile -Server $Server -ScriptFile $ScriptFile -Admin $Admin -Password $Password } | Should Throw "Error during deploying the model (Error: missing server variable)"
+                    { $return = ExecuteScriptFile -Server $Server -ScriptFile $ScriptFile -LoginType "user" -Identifier $Admin -Secret $Password } | Should Throw "Error during deploying the model (Error: missing server variable)"
                 }
             }
 
@@ -132,14 +132,14 @@ Describe "Module: $linkedModule" {
                 $Admin = ''
                 
                 It "Should throw exception" {
-                    { $return = ExecuteScriptFile -Server $Server -ScriptFile $ScriptFile -Admin $Admin -Password $Password } | Should Throw "Error during deploying the model (Error: missing admin variable)"
+                    { $return = ExecuteScriptFile -Server $Server -ScriptFile $ScriptFile -LoginType "user" -Identifier $Admin -Secret $Password } | Should Throw "Error during deploying the model (Error: missing admin variable)"
                 }
             }
 
             Context "Successfull script call; server returns error" {
                 $ScriptFile = 'C:\\ErrorFile'
 
-                $return = ExecuteScriptFile -Server $Server -ScriptFile $ScriptFile -Admin $Admin -Password $Password
+                $return = ExecuteScriptFile -Server $Server -ScriptFile $ScriptFile -LoginType "user" -Identifier $Admin -Secret $Password
                 
                 It "Returns 1 errors" {
                     $return | Should Be -1

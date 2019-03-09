@@ -1,5 +1,5 @@
 # Set the $version to the 'to be tested' version
-$version = '1.1.2'
+$version = '1.2.0'
 
 # Dynamic set the $testModule to the module file linked to the current test file
 $linkedModule = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace('.Tests.ps1', '')
@@ -189,7 +189,7 @@ Describe "Module: $linkedModule" {
 
 
             Context "Successfull deployment" {
-                $return = DeployModel -Server $Server -Command $Command -Admin $Admin -Password $Password
+                $return = DeployModel -Server $Server -Command $Command -LoginType "user" -Identifier $Admin -Secret $Password
                 
                 It "No errors" {
                     $return | Should Be 0
@@ -200,7 +200,7 @@ Describe "Module: $linkedModule" {
                 $Server = ''
                 
                 It "Should throw exception" {
-                    { $return = DeployModel -Server $Server -Command $Command -Admin $Admin -Password $Password } | Should Throw "Error during deploying the model (Error: missing server variable)"
+                    { $return = DeployModel -Server $Server -Command $Command -LoginType "user" -Identifier $Admin -Secret $Password } | Should Throw "Error during deploying the model (Error: missing server variable)"
                 }
             }
 
@@ -208,14 +208,14 @@ Describe "Module: $linkedModule" {
                 $Admin = ''
                 
                 It "Should throw exception" {
-                    { $return = DeployModel -Server $Server -Command $Command -Admin $Admin -Password $Password } | Should Throw "Error during deploying the model (Error: missing admin variable)"
+                    { $return = DeployModel -Server $Server -Command $Command -LoginType "user" -Identifier $Admin -Secret $Password } | Should Throw "Error during deploying the model (Error: missing admin variable)"
                 }
             }
 
             Context "Successfull deployment; server returns error" {
                 $Command = '{Error}'
 
-                $return = DeployModel -Server $Server -Command $Command -Admin $Admin -Password $Password
+                $return = DeployModel -Server $Server -Command $Command -LoginType "user" -Identifier $Admin -Secret $Password
                 
                 It "Returns 1 errors" {
                     $return | Should Be -1
