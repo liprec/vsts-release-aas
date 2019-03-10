@@ -30,6 +30,7 @@ switch ($loginType) {
         $secret = ConvertTo-SecureString (Get-VstsInput -Name "appKey" -Require) -AsPlainText -Force        
     }
 }
+$credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $identifier, $secret
 
 $queryType = Get-VstsInput -Name "queryType" -Require
 
@@ -58,7 +59,6 @@ switch ($loginType) {
         AddCurrentServerToASFirewall -Server $aasServer -Credentials $credentials -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
     }
     "spn" {
-        $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $identifier, $secret
         SetASContext -Server $aasServer -TenantId $tenantId -Credentials $credentials
         AddCurrentServerToASFirewall -Server $aasServer -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
     }
@@ -66,16 +66,16 @@ switch ($loginType) {
 
 switch ($queryType) {
     "tsml" {
-        $result = ExecuteScriptFile -Server $aasServer -ScriptFile $tmslFile -LoginType $loginType -Identifier $identifier -Secret $secret
+        $result = ExecuteScriptFile -Server $aasServer -ScriptFile $tmslFile -LoginType $loginType -Credentials $credentials
     }
     "inline" { 
-        $result = ExecuteScript -Server $aasServer -Script $tmslScript -LoginType $loginType -Identifier $identifier -Secret $secret
+        $result = ExecuteScript -Server $aasServer -Script $tmslScript -LoginType $loginType -Credentials $credentials
     }
     "folder" { 
         $tmslFiles = Get-ChildItem -Path $tmslFolder
         foreach ($tmslFile in $tmslFiles) {
             $scriptFile = $tmslFolder + '\' + $tmslFile
-            $subResult = ExecuteScriptFile -Server $aasServer -ScriptFile $scriptFile -LoginType $loginType -Identifier $identifier -Secret $secret
+            $subResult = ExecuteScriptFile -Server $aasServer -ScriptFile $scriptFile -LoginType $loginType -Credentials $credentials
             switch($subResult) {
                 1  { if ($result -eq 0) { $result = 1 }}
                 -1 { $result = -1 }

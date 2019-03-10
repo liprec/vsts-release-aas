@@ -154,15 +154,14 @@ An example
 .NOTES
 General notes
 #>
-function RemoveModel($Server, $ModelName) {
+function RemoveModel($Server, $ModelName, $LoginType, $Credentials) {
     $removeTsml = '{"delete":{"object":{"database":"existingModel"}}}'
     try {
         $tsml = $removeTsml
         $tsml.delete.object.database = $ModelName
         switch ($LoginType) {
             "user" {
-                $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Identifier, $Secret
-                $result = Invoke-ASCmd -Server $Server -Query $tsml -Credential $credentials
+                $result = Invoke-ASCmd -Server $Server -Query $tsml -Credential $Credentials
             }
             "spn" {
                 $result = Invoke-ASCmd -Server $Server -Query $tsml
@@ -232,12 +231,11 @@ An example
 .NOTES
 General notes
 #>
-function DeployModel($Server, $Command, $LoginType, $Identifier, [SecureString]$Secret) {
+function DeployModel($Server, $Command, $LoginType, $Credentials) {
     try {
         switch ($LoginType) {
             "user" {
-                $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Identifier, $Secret
-                $result = Invoke-ASCmd -Server $Server -Query $Command -Credential $credentials
+                $result = Invoke-ASCmd -Server $Server -Query $Command -Credential $Credentials
             }
             "spn" {
                 $result = Invoke-ASCmd -Server $Server -Query $Command
@@ -391,7 +389,7 @@ function AddCurrentServerToASFirewall($Server, $Credentials, $AzContext, $IpDete
         if ($currentConfig.EnablePowerBIService) {
             $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -EnablePowerBIService -DefaultProfile $AzContext
         } else {
-            $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules
+            $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -DefaultProfile $AzContext
         }
         $result = Set-AzureRmAnalysisServicesServer -Name $serverName -FirewallConfig $firewallConfig -DefaultProfile $AzContext
     } catch {

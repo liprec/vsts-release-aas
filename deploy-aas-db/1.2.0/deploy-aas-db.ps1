@@ -33,6 +33,7 @@ switch ($loginType) {
         $secret = ConvertTo-SecureString (Get-VstsInput -Name "appKey" -Require) -AsPlainText -Force        
     }
 }
+$credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $identifier, $secret
 
 $pathToModel = Get-VstsInput -Name "pathToModel" -Require
 $connectionType = Get-VstsInput -Name "connectionType" -Require
@@ -99,7 +100,6 @@ switch ($loginType) {
     }
     "spn" {
         Write-Verbose "Set service principal context and firewall"
-        $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $identifier, $secret
         SetASContext -Server $aasServer -TenantId $tenantId -Credentials $credentials
         AddCurrentServerToASFirewall -Server $aasServer -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
     }
@@ -108,7 +108,7 @@ switch ($loginType) {
 # Remove old model
 if ($remove) {
     Write-Verbose "Remove model"
-    $result = RemoveModel -Server $aasServer -ModelName $modelName
+    $result = RemoveModel -Server $aasServer -ModelName $modelName -LoginType $loginType -Credentials $credentials
 } else {
     $result = $true;
 }
@@ -116,7 +116,7 @@ if ($remove) {
 # Deploy new model
 if ($result) {
     Write-Verbose "Deploy model"
-    $result = DeployModel -Server $aasServer -Command $tsmlCommand -LoginType $loginType -Identifier $identifier -Secret $secret
+    $result = DeployModel -Server $aasServer -Command $tsmlCommand -LoginType $loginType -Credentials $credentials
 }
 
 # Remove firewall rule

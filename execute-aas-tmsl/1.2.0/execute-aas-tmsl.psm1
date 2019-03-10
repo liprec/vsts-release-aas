@@ -14,10 +14,7 @@ Parameter description
 .PARAMETER LoginType
 Parameter description
 
-.PARAMETER Identifier
-Parameter description
-
-.PARAMETER Secret
+.PARAMETER Credentials
 Parameter description
 
 .EXAMPLE
@@ -26,12 +23,11 @@ An example
 .NOTES
 General notes
 #>
-function ExecuteScript($Server, $Script, $LoginType, $Identifier, [SecureString]$Secret) {
+function ExecuteScript($Server, $Script, $LoginType, $Credentials) {
     try {
         switch ($LoginType) {
             "user" {
-                $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Identifier, $Secret
-                $result = Invoke-ASCmd -Server $Server -Query $Script -Credential $credentials
+                $result = Invoke-ASCmd -Server $Server -Query $Script -Credential $Credentials
             }
             "spn" {
                 $result = Invoke-ASCmd -Server $Server -Query $Script
@@ -60,10 +56,7 @@ Parameter description
 .PARAMETER LoginType
 Parameter description
 
-.PARAMETER Identifier
-Parameter description
-
-.PARAMETER Secret
+.PARAMETER Credentials
 Parameter description
 
 .EXAMPLE
@@ -72,12 +65,11 @@ An example
 .NOTES
 General notes
 #>
-function ExecuteScriptFile($Server, $ScriptFile, $LoginType, $Identifier, [SecureString]$Secret) {
+function ExecuteScriptFile($Server, $ScriptFile, $LoginType, $Credentials) {
     try {
         switch ($LoginType) {
             "user" {
-                $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Identifier, $Secret
-                $result = Invoke-ASCmd -Server $Server -InputFile $ScriptFile -Credential $credentials
+                $result = Invoke-ASCmd -Server $Server -InputFile $ScriptFile -Credential $Credentials
             }
             "spn" {                
                 $result = Invoke-ASCmd -Server $Server -InputFile $ScriptFile
