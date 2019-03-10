@@ -381,21 +381,23 @@ function AddCurrentServerToASFirewall($Server, $Credentials, $AzContext, $IpDete
             }
         }
     }
-    try {
-        $currentConfig = (Get-AzureRmAnalysisServicesServer -Name $serverName -DefaultProfile $AzContext)[0].FirewallConfig
-        $currentFirewallRules = $currentConfig.FirewallRules
-        $firewallRule = New-AzureRmAnalysisServicesFirewallRule -FirewallRuleName 'vsts-release-aas-rule' -RangeStart $startIP -RangeEnd $endIP -DefaultProfile $AzContext
-        $currentFirewallRules.Add($firewallRule)
-        if ($currentConfig.EnablePowerBIService) {
-            $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -EnablePowerBIService -DefaultProfile $AzContext
-        } else {
-            $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -DefaultProfile $AzContext
+    if (($null -ne $startIP) -and ($null -ne $endIP)) {
+        try {
+            $currentConfig = (Get-AzureRmAnalysisServicesServer -Name $serverName -DefaultProfile $AzContext)[0].FirewallConfig
+            $currentFirewallRules = $currentConfig.FirewallRules
+            $firewallRule = New-AzureRmAnalysisServicesFirewallRule -FirewallRuleName 'vsts-release-aas-rule' -RangeStart $startIP -RangeEnd $endIP -DefaultProfile $AzContext
+            $currentFirewallRules.Add($firewallRule)
+            if ($currentConfig.EnablePowerBIService) {
+                $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -EnablePowerBIService -DefaultProfile $AzContext
+            } else {
+                $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -DefaultProfile $AzContext
+            }
+            $result = Set-AzureRmAnalysisServicesServer -Name $serverName -FirewallConfig $firewallConfig -DefaultProfile $AzContext
+        } catch {
+            $errMsg = $_.exception.message
+            Write-Host "##vso[task.logissue type=error;]Error during adding firewall rule ($errMsg)"
+            throw
         }
-        $result = Set-AzureRmAnalysisServicesServer -Name $serverName -FirewallConfig $firewallConfig -DefaultProfile $AzContext
-    } catch {
-        $errMsg = $_.exception.message
-        Write-Host "##vso[task.logissue type=error;]Error during adding firewall rule ($errMsg)"
-        throw
     }
 }
 
