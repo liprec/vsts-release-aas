@@ -186,6 +186,7 @@ General notes
 function AddCurrentServerToASFirewall($Server, $Credentials, $AzContext, $IpDetectionMethod , $StartIPAddress, $EndIPAddress) {
     $qry = "<Discover xmlns='urn:schemas-microsoft-com:xml-analysis'><RequestType>DISCOVER_PROPERTIES</RequestType><Restrictions/><Properties/></Discover>"
     $serverName = $Server.Split('/')[3];
+    $added = $false
     switch ($IpDetectionMethod) {
         "ipAddressRange" {
             $startIP = $StartIPAddress
@@ -214,6 +215,7 @@ function AddCurrentServerToASFirewall($Server, $Credentials, $AzContext, $IpDete
     }
     if (($null -ne $startIP) -and ($null -ne $endIP)) {
         try {
+            $added = $true
             $currentConfig = (Get-AzureRmAnalysisServicesServer -Name $serverName -DefaultProfile $AzContext)[0].FirewallConfig
             $currentFirewallRules = $currentConfig.FirewallRules
             $firewallRule = New-AzureRmAnalysisServicesFirewallRule -FirewallRuleName 'vsts-release-aas-rule' -RangeStart $startIP -RangeEnd $endIP -DefaultProfile $AzContext
@@ -221,7 +223,7 @@ function AddCurrentServerToASFirewall($Server, $Credentials, $AzContext, $IpDete
             if ($currentConfig.EnablePowerBIService) {
                 $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -EnablePowerBIService -DefaultProfile $AzContext
             } else {
-                $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules
+                $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -DefaultProfile $AzContext
             }
             $result = Set-AzureRmAnalysisServicesServer -Name $serverName -FirewallConfig $firewallConfig -DefaultProfile $AzContext
         } catch {
@@ -230,6 +232,8 @@ function AddCurrentServerToASFirewall($Server, $Credentials, $AzContext, $IpDete
             throw
         }
     }
+
+    return $added
 }
 
 <#
@@ -260,7 +264,7 @@ function RemoveCurrentServerFromASFirewall($Server, $AzContext) {
         if ($currentConfig.EnablePowerBIService) {
             $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $newFirewallRules -EnablePowerBIService -DefaultProfile $AzContext
         } else {
-            $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $newFirewallRules
+            $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $newFirewallRules -DefaultProfile $AzContext
         }
         $result = Set-AzureRmAnalysisServicesServer -Name $serverName -FirewallConfig $firewallConfig -DefaultProfile $AzContext
     } catch {
@@ -268,4 +272,6 @@ function RemoveCurrentServerFromASFirewall($Server, $AzContext) {
         Write-Host "##vso[task.logissue type=error;]Error during removing firewall rule ($errMsg)"
         throw
     }
+
+    return $true
 }

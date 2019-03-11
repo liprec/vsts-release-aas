@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "vsts-release-aas",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "name": "Azure Analysis Service",
     "publisher": "liprec",
     "public": true,

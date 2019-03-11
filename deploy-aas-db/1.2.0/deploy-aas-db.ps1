@@ -96,12 +96,12 @@ $tsmlCommand = PrepareCommand -Model $model -Overwrite $overwrite -ModelName $mo
 switch ($loginType) {
     "user" {
         Write-Verbose "Set firewall"
-        AddCurrentServerToASFirewall -Server $aasServer -Credentials $credentials -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
+        $addedFirewallRule = AddCurrentServerToASFirewall -Server $aasServer -Credentials $credentials -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
     }
     "spn" {
         Write-Verbose "Set service principal context and firewall"
         SetASContext -Server $aasServer -TenantId $tenantId -Credentials $credentials
-        AddCurrentServerToASFirewall -Server $aasServer -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
+        $addedFirewallRule = AddCurrentServerToASFirewall -Server $aasServer -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
     }
 }
 
@@ -120,7 +120,7 @@ if ($result) {
 }
 
 # Remove firewall rule
-if ($deleteFirewallRule) {
+if (($deleteFirewallRule) -and ($addedFirewallRule)) {
     Write-Verbose "Remove firewall rule"
     RemoveCurrentServerFromASFirewall -Server $aasServer -AzContext $azContext
 }

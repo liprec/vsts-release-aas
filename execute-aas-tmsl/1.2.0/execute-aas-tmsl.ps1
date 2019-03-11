@@ -56,11 +56,11 @@ $result = 0
 
 switch ($loginType) {
     "user" {
-        AddCurrentServerToASFirewall -Server $aasServer -Credentials $credentials -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
+        $addedFirewallRule = AddCurrentServerToASFirewall -Server $aasServer -Credentials $credentials -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
     }
     "spn" {
         SetASContext -Server $aasServer -TenantId $tenantId -Credentials $credentials
-        AddCurrentServerToASFirewall -Server $aasServer -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
+        $addedFirewallRule = AddCurrentServerToASFirewall -Server $aasServer -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
     }
 }
 
@@ -84,7 +84,7 @@ switch ($queryType) {
     }
 }
 
-if ($deleteFirewallRule) {
+if (($deleteFirewallRule) -and ($addedFirewallRule)) {
     RemoveCurrentServerFromASFirewall -Server $aasServer -AzContext $azContext
 }
 
