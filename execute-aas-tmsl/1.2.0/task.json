@@ -16,9 +16,9 @@
     "version": {
         "Major": "1",
         "Minor": "2",
-        "Patch": "4"
+        "Patch": "5"
     },
-    "minimumAgentVersion": "1.95.0",
+    "minimumAgentVersion": "2.115.0",
     "groups": [
         {
             "name": "azure",
@@ -213,6 +213,35 @@
             "groupName": "firewall",
             "defaultValue": "true",
             "helpMarkDown": "If selected, the added exception for IP addresses of the automation agent will be removed for corresponding Azure Database for MySQL."
+        },
+        {
+            "name": "targetAzurePs",
+            "aliases": [
+                "azurePowerShellVersion"
+            ],
+            "type": "radio",
+            "label": "Azure PowerShell Version",
+            "defaultValue": "latestVersion",
+            "required": false,
+            "options": {
+                "latestVersion": "Latest installed version",
+                "otherVersion": "Specify other version"
+            },
+            "groupName": "advanced",
+            "helpMarkDown": "In case of hosted agents, the supported Azure PowerShell Version is: 1.0.0(Hosted VS2017 Queue).\nTo pick the latest version available on the agent, select \"Latest installed version\".\n\nFor private agents you can specify preferred version of Azure PowerShell using \"Specify version\""
+        },
+        {
+            "name": "customTargetAzurePs",
+            "aliases": [
+                "preferredAzurePowerShellVersion"
+            ],
+            "type": "string",
+            "label": "Preferred Azure PowerShell Version",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "targetAzurePs = otherVersion",
+            "groupName": "advanced",
+            "helpMarkDown": "Preferred Azure PowerShell Version needs to be a proper semantic version eg. 1.2.3. Regex like 2.\\*,2.3.\\* is not supported. The Hosted VS2017 Pool currently supports Az module version: 1.0.0"
         }
     ],
     "dataSourceBindings": [

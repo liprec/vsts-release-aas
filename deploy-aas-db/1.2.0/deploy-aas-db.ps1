@@ -3,6 +3,30 @@ param()
 
 Trace-VstsEnteringInvocation $MyInvocation
 
+$targetAzurePs = Get-VstsInput -Name targetAzurePs
+$customTargetAzurePs = Get-VstsInput -Name customTargetAzurePs
+
+# string constants
+$otherVersion = "otherVersion"
+$latestVersion = "latestVersion"
+
+if ($targetAzurePs -eq $otherVersion) {
+    if ($customTargetAzurePs -eq $null) {
+        throw "The Azure PowerShell version '$customTargetAzurePs' specified is not in the correct format. Please check the format. An example of correct format is 1.0.1"
+    } else {
+        $targetAzurePs = $customTargetAzurePs.Trim()        
+    }
+}
+
+$pattern = "^[0-9]+\.[0-9]+\.[0-9]+$"
+$regex = New-Object -TypeName System.Text.RegularExpressions.Regex -ArgumentList $pattern
+
+if ($targetAzurePs -eq $latestVersion) {
+    $targetAzurePs = ""
+} elseif (-not($regex.IsMatch($targetAzurePs))) {
+    throw "The Azure PowerShell version '$targetAzurePs' specified is not in the correct format. Please check the format. An example of correct format is 1.0.1"
+}
+
 $linkedModule = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace('.ps1', '.psm1')
 
 # Import the logic of the linked module
@@ -13,7 +37,8 @@ Import-Module $PSScriptRoot\ps_modules\AzureRM.AnalysisServices
 Import-Module $PSScriptRoot\ps_modules\Azure.AnalysisServices
 Import-Module $PSScriptRoot\ps_modules\SqlServer
 
-Initialize-Azure
+Initialize-Azure -azurePsVersion $targetAzurePs
+
 $azContext = Get-AzureRmContext
 
 $aasServer = Get-VstsInput -Name "aasServer" -Require
