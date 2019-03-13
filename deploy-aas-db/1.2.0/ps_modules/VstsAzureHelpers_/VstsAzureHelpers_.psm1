@@ -11,14 +11,22 @@ if ($global:DebugPreference -eq 'Continue') {
 # Import the loc strings.
 Import-VstsLocStrings -LiteralPath $PSScriptRoot/module.json
 
+[System.Net.WebRequest]::DefaultWebProxy = Get-VstsWebProxy
+
+Import-Module $PSScriptRoot/../TlsHelper_
+Add-Tls12InSession
+
 # Dot source the private functions.
 . $PSScriptRoot/InitializeFunctions.ps1
 . $PSScriptRoot/ImportFunctions.ps1
+. $PSScriptRoot/InitializeAzureRMFunctions.ps1
+. $PSScriptRoot/InitializeAzModuleFunctions.ps1
 
 # This is the only public function.
 function Initialize-Azure {
     [CmdletBinding()]
-    param()
+    param( [string] $azurePsVersion,
+           [switch] $strict )
     Trace-VstsEnteringInvocation $MyInvocation
     try {
         # Get the inputs.
@@ -34,9 +42,9 @@ function Initialize-Azure {
 
         # Determine which modules are preferred.
         $preferredModules = @( )
-        if ($endpoint.Auth.Scheme -eq 'ServicePrincipal') {
+        if (($endpoint.Auth.Scheme -eq 'ServicePrincipal') -or ($endpoint.Auth.Scheme -eq 'ManagedServiceIdentity')) {
             $preferredModules += 'AzureRM'
-        } elseif ($endpoint.Auth.Scheme -eq 'UserNamePassword') {
+        } elseif ($endpoint.Auth.Scheme -eq 'UserNamePassword' -and $strict -eq $false) {
             $preferredModules += 'Azure'
             $preferredModules += 'AzureRM'
         } else {
@@ -44,12 +52,24 @@ function Initialize-Azure {
         }
 
         # Import/initialize the Azure module.
-        Import-AzureModule -PreferredModule $preferredModules
+        $currentWarningPreference = $WarningPreference
+        $WarningPreference = "SilentlyContinue"
+        Import-AzureModule -PreferredModule $preferredModules -azurePsVersion $azurePsVersion -strict:$strict
         Initialize-AzureSubscription -Endpoint $endpoint -StorageAccount $storageAccount
     } finally {
+        if (![string]::IsNullOrEmpty($currentWarningPreference)) {
+            $WarningPreference = $currentWarningPreference
+        } else {
+            $WarningPreference = "Continue"
+        }
         Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
 # Export only the public function.
 Export-ModuleMember -Function Initialize-Azure
+Export-ModuleMember -Function CmdletHasMember
+Export-ModuleMember -Function Remove-EndpointSecrets
+Export-ModuleMember -Function Initialize-AzureRMModule
+Export-ModuleMember -Function Initialize-AzModule
+Export-ModuleMember -Function Disconnect-AzureAndClearContext
