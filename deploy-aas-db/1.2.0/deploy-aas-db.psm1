@@ -155,7 +155,7 @@ An example
 General notes
 #>
 function RemoveModel($Server, $ModelName, $LoginType, $Credentials) {
-    $removeTsml = '{"delete":{"object":{"database":"existingModel"}}}'
+    $removeTsml = '{"delete":{"object":{"database":"existingModel"}}}' | ConvertFrom-Json
     try {
         $tsml = $removeTsml
         $tsml.delete.object.database = $ModelName
