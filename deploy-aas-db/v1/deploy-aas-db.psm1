@@ -155,16 +155,17 @@ An example
 General notes
 #>
 function RemoveModel($Server, $ModelName, $LoginType, $Credentials) {
-    $removeTsml = '{"delete":{"object":{"database":"existingModel"}}}' | ConvertFrom-Json
+    $removeTmsl = '{"delete":{"object":{"database":"existingModel"}}}' | ConvertFrom-Json
     try {
-        $tsml = $removeTsml
-        $tsml.delete.object.database = $ModelName
+        $tmsl = $removeTmsl
+        $tmsl.delete.object.database = $ModelName
+        $tmslRemove = ConvertTo-Json $tmsl -Depth 100 -Compress
         switch ($LoginType) {
             "user" {
-                $result = Invoke-ASCmd -Server $Server -Query $tsml -Credential $Credentials
+                $result = Invoke-ASCmd -Server $Server -Query $tmslRemove -Credential $Credentials
             }
             "spn" {
-                $result = Invoke-ASCmd -Server $Server -Query $tsml
+                $result = Invoke-ASCmd -Server $Server -Query $tmslRemove
             }
         }
         return ProcessMessages($result)
@@ -197,18 +198,18 @@ An example
 General notes
 #>
 function PrepareCommand($Model, $Overwrite, $ModelName) {
-    $createTsml = '{"create":{"database":{"name":"emptyModel"}}}' | ConvertFrom-Json
-    $updateTsml = '{"createOrReplace":{"object":{"database":"existingModel"},"database":{"name":"emptyModel"}}}' | ConvertFrom-Json
+    $createTmsl = '{"create":{"database":{"name":"emptyModel"}}}' | ConvertFrom-Json
+    $updateTmsl = '{"createOrReplace":{"object":{"database":"existingModel"},"database":{"name":"emptyModel"}}}' | ConvertFrom-Json
 
     if ($Overwrite) {
-        $tsml = $updateTsml
-        $tsml.createOrReplace.object.database = $ModelName
-        $tsml.createOrReplace.database = $Model
-        return ConvertTo-Json $tsml -Depth 100 -Compress
+        $tmsl = $updateTmsl
+        $tmsl.createOrReplace.object.database = $ModelName
+        $tmsl.createOrReplace.database = $Model
+        return ConvertTo-Json $tmsl -Depth 100 -Compress
     } else {
-        $tsml = $createTsml
-        $tsml.create.database = $Model
-        return ConvertTo-Json $tsml -Depth 100 -Compress
+        $tmsl = $createTmsl
+        $tmsl.create.database = $Model
+        return ConvertTo-Json $tmsl -Depth 100 -Compress
     }
 }
 

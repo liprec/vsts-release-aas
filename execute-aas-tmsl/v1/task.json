@@ -16,7 +16,7 @@
     "version": {
         "Major": "1",
         "Minor": "3",
-        "Patch": "0"
+        "Patch": "1"
     },
     "minimumAgentVersion": "2.115.0",
     "groups": [
@@ -150,6 +150,9 @@
         },
         {
             "name": "tsmlFile",
+            "aliases": [
+                "tmslFile"
+            ],
             "type": "filePath",
             "label": "TMSL File",
             "helpMarkDown": "Location of the TMSL file on the automation agent or on a UNC path accessible to the automation agent like, \\\\BudgetIT\\Web\\Deploy\\Fabrikam.tsml. Predefined system variables like, $(agent.releaseDirectory) can also be used here.",
@@ -158,6 +161,9 @@
         },
         {
             "name": "tsmlScript",
+            "aliases": [
+                "tmslScript"
+            ],
             "type": "multiLine",
             "label": "Inline TMSL Script",
             "helpMarkDown": "Enter the TMSL script to execute on the Azure Analysis Service instance selected above.",

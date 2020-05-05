@@ -114,8 +114,8 @@ switch ($connectionType) {
     }
 }
 
-# Create TSML command
-$tsmlCommand = PrepareCommand -Model $model -Overwrite $overwrite -ModelName $modelName
+# Create TMSL command
+$tmslCommand = PrepareCommand -Model $model -Overwrite $overwrite -ModelName $modelName
 
 # Remove leftover firewall rule
 if (($deleteFirewallRule) -and ($addedFirewallRule)) {
@@ -147,7 +147,7 @@ if ($remove) {
 # Deploy new model
 if ($result) {
     Write-Verbose "Deploy model"
-    $result = DeployModel -Server $aasServer -Command $tsmlCommand -LoginType $loginType -Credentials $credentials
+    $result = DeployModel -Server $aasServer -Command $tmslCommand -LoginType $loginType -Credentials $credentials
 }
 
 # Remove firewall rule
