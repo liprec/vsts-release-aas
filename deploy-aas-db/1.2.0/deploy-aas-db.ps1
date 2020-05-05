@@ -117,6 +117,12 @@ switch ($connectionType) {
 # Create TSML command
 $tsmlCommand = PrepareCommand -Model $model -Overwrite $overwrite -ModelName $modelName
 
+# Remove leftover firewall rule
+if (($deleteFirewallRule) -and ($addedFirewallRule)) {
+    Write-Verbose "Remove leftover firewall rule"
+    RemoveCurrentServerFromASFirewall -Server $aasServer -AzContext $azContext
+}
+
 # Set firewall and SP context
 switch ($loginType) {
     "user" {
