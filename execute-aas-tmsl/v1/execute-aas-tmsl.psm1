@@ -185,7 +185,7 @@ General notes
 #>
 function AddCurrentServerToASFirewall($Server, $Credentials, $AzContext, $IpDetectionMethod , $StartIPAddress, $EndIPAddress) {
     $qry = "<Discover xmlns='urn:schemas-microsoft-com:xml-analysis'><RequestType>DISCOVER_PROPERTIES</RequestType><Restrictions/><Properties/></Discover>"
-    $serverName = $Server.Split('/')[3];
+    $serverName = $Server.Split('/')[3].Replace(':rw','');
     $added = $false
     switch ($IpDetectionMethod) {
         "ipAddressRange" {
@@ -256,7 +256,7 @@ An example
 General notes
 #>
 function RemoveCurrentServerFromASFirewall($Server, $AzContext) {
-    $serverName = $Server.Split('/')[3];
+    $serverName = $Server.Split('/')[3].Replace(':rw','');
     try {
         $currentConfig = (Get-AzureRmAnalysisServicesServer -Name $serverName -DefaultProfile $AzContext)[0].FirewallConfig
         $newFirewallRules = $currentConfig.FirewallRules
