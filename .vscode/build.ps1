@@ -3,7 +3,7 @@ param(
     [string]$manifestFile
 )
 
-$result = Invoke-Pester -Script @{ Path = './tests/*' } -PassThru -Show None
+$result = Invoke-Pester -Script @{ Path = '../tests/*' } -PassThru -Show None
 
 $totalCount = $result.TotalCount
 $passedCount = $result.PassedCount
