@@ -4,7 +4,7 @@
     "friendlyName": "Azure Analysis Service Deployment",
     "description": "Deploy Azure Analysis Service databases",
     "author": "Jan Pieter Posthuma",
-    "helpMarkDown": "[More Information](https://github.com/liprec/vsts-deploy-aas)",
+    "helpMarkDown": "[More Information](https://github.com/liprec/vsts-release-aas)",
     "category": "Deploy",
     "visibility": [
         "Build",
