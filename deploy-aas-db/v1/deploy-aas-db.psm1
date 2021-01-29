@@ -118,7 +118,7 @@ function ApplySQLSecurity($Model, $Server, $Database, $UserName, $Password) {
     $credential = ConvertFrom-Json '{"credential":{"AuthenticationKind":"UsernamePassword","kind":"kind","path":"server","Username":"user","Password":"pass","EncryptConnection":true}}'
     $dataSources = $Model.model.dataSources
     foreach($dataSource in $dataSources) {
-        if ($dataSource.type) {
+        if ($dataSource.type -and $dataSource.connectionDetails) {
             $connectionDetails.connectionDetails.protocol = $dataSource.connectionDetails.protocol
             $connectionDetails.connectionDetails.address.server = $Server
             $connectionDetails.connectionDetails.address.database = $Database
@@ -130,6 +130,10 @@ function ApplySQLSecurity($Model, $Server, $Database, $UserName, $Password) {
             $credential.credential.Username = $UserName
             $credential.credential.Password = $Password
             $dataSource.credential = $credential.credential
+        }
+        else {
+         $dataSource.connectionString = "Provider=SQLOLEDB;Data Source=" + $Server + ";User ID=" + $UserName + ";Password=" + $Password + ";Initial Catalog=" + $Database
+		 $dataSource.impersonationMode = "ImpersonateServiceAccount"
         }
     }
     return $Model
