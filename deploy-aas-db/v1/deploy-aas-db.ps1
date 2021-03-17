@@ -118,7 +118,7 @@ switch ($connectionType) {
 $tmslCommand = PrepareCommand -Model $model -Overwrite $overwrite -ModelName $modelName
 
 # Remove leftover firewall rule
-if (($deleteFirewallRule) -and ($addedFirewallRule)) {
+if ($deleteFirewallRule) {
     Write-Verbose "Remove leftover firewall rule"
     RemoveCurrentServerFromASFirewall -Server $aasServer -AzContext $azContext
 }
