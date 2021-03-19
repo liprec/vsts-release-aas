@@ -130,6 +130,14 @@ function ApplySQLSecurity($Model, $Server, $Database, $UserName, $Password) {
             $credential.credential.Username = $UserName
             $credential.credential.Password = $Password
             $dataSource.credential = $credential.credential
+        } else {
+            $connectionString = $dataSource.connectionString
+            $connectionStringJSON = ConvertFrom-Json ("{`"" + $connectionString.replace("=", "`":`"").replace(";", "`",`"") + "`"}")
+            $connectionStringJSON."Data Source" = $Server
+            $connectionStringJSON."Initial Catalog" = $Database
+            $connectionStringJSON."User ID" = $UserName
+            $connectionStringJSON | Add-Member -name "Password" -Value $Password -MemberType NoteProperty
+            $dataSource.connectionString = ($connectionStringJSON | ConvertTo-Json -Compress).replace("`":`"", "=").replace("`",`"", ";").replace("{`"", "").replace("`"}", "")
         }
     }
     return $Model
