@@ -24,7 +24,7 @@ jobs:
         if: ${{ endsWith(github.ref, 'main') }}
         id: extract_version
         run: |
-          node -e "const v = require('.\vss-extension.json').version;console.log('::set-output name=version::' + v);"
+          node -e "const v = require('.\\vss-extension.json').version;console.log('::set-output name=version::' + v);"
       - name: store extension - production version
         if: ${{ endsWith(github.ref, 'main') }}
         uses: actions/upload-artifact@v2
@@ -41,7 +41,7 @@ jobs:
         if: ${{ endsWith(github.ref, 'develop') }}
         id: extract_version_preview
         run: |
-          node -e "const v = require('.\vss-extension-preview.json').version;console.log('::set-output name=version::' + v);"
+          node -e "const v = require('.\\vss-extension-preview.json').version;console.log('::set-output name=version::' + v);"
       - name: store extension - preview version
         if: ${{ endsWith(github.ref, 'develop') }}
         uses: actions/upload-artifact@v2
