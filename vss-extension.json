@@ -50,6 +50,9 @@
         },
         "support": {
             "uri": "https://github.com/liprec/vsts-release-aas/issues"
+        },
+        "privacypolicy": {
+            "uri": "https://azurebi-docs.jppp.org/vsts-extensions/privacy-terms.html"
         }
     },
     "repository": {
