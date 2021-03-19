@@ -19,7 +19,7 @@ jobs:
       - name: run tfx-cli - production version
         if: ${{ endsWith(github.ref, 'main') }}
         run: |
-          $GITHUB_WORKSPACE\node_modules\.bin\tfx extension create --manifest-globs $GITHUB_WORKSPACE\vss-extension.json
+          .\node_modules\.bin\tfx extension create --manifest-globs $.\vss-extension.json
       - name: extract version name - production version
         if: ${{ endsWith(github.ref, 'main') }}
         id: extract_version
@@ -36,7 +36,7 @@ jobs:
       - name: run tfx-cli - preview version
         if: ${{ endsWith(github.ref, 'develop') }}
         run: |
-          $GITHUB_WORKSPACE\node_modules\.bin\tfx extension create --manifest-globs $GITHUB_WORKSPACE\vss-extension-preview.json
+          .\node_modules\.bin\tfx extension create --manifest-globs .\vss-extension-preview.json
       - name: extract version name - preview version
         if: ${{ endsWith(github.ref, 'develop') }}
         id: extract_version_preview
