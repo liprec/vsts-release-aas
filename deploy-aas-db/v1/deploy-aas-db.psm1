@@ -425,7 +425,7 @@ An example
 .NOTES
 General notes
 #>
-function RemoveCurrentServerFromASFirewall($Server, $AzContext) {
+function RemoveCurrentServerFromASFirewall($Server, $AzContext, $Skip) {
     $serverName = $Server.Split('/')[3].Replace(':rw','');
     try {
         $currentConfig = (Get-AzureRmAnalysisServicesServer -Name $serverName -DefaultProfile $AzContext)[0].FirewallConfig
@@ -438,8 +438,10 @@ function RemoveCurrentServerFromASFirewall($Server, $AzContext) {
         }
         $result = Set-AzureRmAnalysisServicesServer -Name $serverName -FirewallConfig $firewallConfig -DefaultProfile $AzContext
     } catch {
-        $errMsg = $_.exception.message
-        Write-Host "##vso[task.logissue type=error;]Error during removing firewall rule ($errMsg)"
-        throw
+        if ($Skip -ne $true) {
+            $errMsg = $_.exception.message
+            Write-Host "##vso[task.logissue type=error;]Error during removing firewall rule ($errMsg)"
+            throw
+        }
     }
 }
