@@ -1,8 +1,13 @@
-[![Build status](https://github.com/liprec/vsts-release-aas/actions/workflows/build.yml/badge.svg)](https://github.com/liprec/vsts-release-aas/actions/workflows/build.yml)
-
 # Azure Analysis Service
 
 This extension adds release tasks related to Azure Analysis Service to Visual Studio Team Service.
+
+## Build status
+
+| Branch  | status                                                                                                                                                                                                                           |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Main    | [![Build and test](https://github.com/liprec/vsts-release-aas/workflows/Build%20and%20test/badge.svg?branch=main)](https://github.com/liprec/vsts-release-aas/actions?query=branch%3Amain+workflow%3A%22Build+and+test%22)       |
+| Develop | [![Build and test](https://github.com/liprec/vsts-release-aas/workflows/Build%20and%20test/badge.svg?branch=develop)](https://github.com/liprec/vsts-release-aas/actions?query=branch%3Adevelop+workflow%3A%22Build+and+test%22) |
 
 ## Azure Analysis Service Deployment
 

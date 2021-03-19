@@ -59,13 +59,6 @@
         "type": "git",
         "uri": "https://github.com/liprec/vsts-release-aas"
     },
-    "badges": [
-        {
-            "href": "https://ci.appveyor.com/project/liprec/vsts-release-aas",
-            "uri": "https://ci.appveyor.com/api/projects/status/github/liprec/vsts-release-aas?branch=master&svg=true",
-            "description": "Latest AppVeyor build"
-        }
-    ],
     "contributions": [
         {
             "id": "deploy-aas-db",
