@@ -79,6 +79,13 @@ if ($deleteFirewallRule -eq "true") {
 
 $result = 0
 
+# Remove leftover firewall rule
+if ($deleteFirewallRule) {
+    Write-Verbose "Try to remove leftover firewall rule"
+    RemoveCurrentServerFromASFirewall -Server $aasServer -AzContext $azContext -Skip $true
+}
+
+# Set firewall and SP context
 switch ($loginType) {
     "user" {
         $addedFirewallRule = AddCurrentServerToASFirewall -Server $aasServer -Credentials $credentials -AzContext $azContext -IpDetectionMethod $ipDetectionMethod -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress
