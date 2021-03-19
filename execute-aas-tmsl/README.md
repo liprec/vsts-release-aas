@@ -14,7 +14,7 @@ Analysis Service Details:
 - **Analysis Service name** - The name of the Azure Analysis Service server
 - **Login type** - Type of Azure Analysis Service login: Named user or Service Principal
 
-If **Login type** option is 'ervice Principal':
+If **Login type** option is 'Service Principal':
 - **Azure AD TenantID** - Azure ID Tenant ID
 - **Application ID** - Application ID of the Service Principal
 - **Application Key** - Key of the Application ID

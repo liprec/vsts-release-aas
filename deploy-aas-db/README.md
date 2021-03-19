@@ -17,7 +17,7 @@ Analysis Service Details:
 - **Analysis Service name** - The name of the Azure Analysis Service server
 - **Login type** - Type of Azure Analysis Service login: Named user or Service Principal
 
-If **Login type** option is 'ervice Principal':
+If **Login type** option is 'Service Principal':
 - **Azure AD TenantID** - Azure ID Tenant ID
 - **Application ID** - Application ID of the Service Principal
 - **Application Key** - Key of the Application ID
@@ -51,6 +51,9 @@ At this moment the following configuration are tested and working:
 More configuration will follow. Feel free to contact me for a specific configuration.
 
 ## Release notes
+
+**1.3.0**
+- Support for legacy datasources
 
 **1.2.0**
 - Add support for service principal deployments

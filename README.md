@@ -1,4 +1,4 @@
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/liprec/vsts-release-aas?branch=master&svg=true)](https://ci.appveyor.com/project/liprec/vsts-release-aas)
+[![Build status](https://github.com/liprec/vsts-release-aas/actions/workflows/build.yml/badge.svg)](https://github.com/liprec/vsts-release-aas/actions/workflows/build.yml)
 
 # Azure Analysis Service
 
@@ -24,6 +24,9 @@ This release task can be added to a release pipeline to execute a custom TMSL sc
 [More information](execute-aas-tmsl/README.md)
 
 ## Release notes
+
+**1.3.0**
+- Support for legacy datasources
 
 **1.2.0**
 - Add support for service principal deployments
