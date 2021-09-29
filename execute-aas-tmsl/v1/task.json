@@ -76,10 +76,10 @@
         {
             "name": "aasServer",
             "type": "string",
-            "label": "Analysis Services name",
+            "label": "Analysis Services Server",
             "defaultValue": "",
             "required": "true",
-            "helpMarkDown": "Azure Analysis Services name, like 'asazure://westeurope.asazure.windows.net/fabrikam'.",
+            "helpMarkDown": "Azure Analysis Services Server name, like 'asazure://westeurope.asazure.windows.net/fabrikam'.",
             "groupname": "aas"
         },
         {
