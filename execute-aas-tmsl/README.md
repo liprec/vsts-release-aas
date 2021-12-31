@@ -1,4 +1,4 @@
-# Azure Analysis Service TMSL Script
+# TMSL Script
 
 Azure DevOps pipeline task to execute a custom TMSL script against an Azure Analysis Service or Power BI Premium dataset. 
 

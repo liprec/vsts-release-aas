@@ -1,4 +1,4 @@
-# Azure Analysis Service deployment
+# Tabular Database Deployment
 
 Azure DevOps pipeline task that will deploy a Tabular Model to an existing Azure Analysis Service or Power BI Premium dataset. 
 
