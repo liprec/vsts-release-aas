@@ -1,6 +1,6 @@
 # Azure Analysis Service
 
-This extension adds release tasks related to Azure Analysis Service to Visual Studio Team Service.
+This extension adds Azure DevOps pipeline tasks for Azure Analysis Service or Power BI Premium
 
 ## Build status
 
@@ -9,26 +9,17 @@ This extension adds release tasks related to Azure Analysis Service to Visual St
 | Main    | [![Build and test](https://github.com/liprec/vsts-release-aas/workflows/Build%20and%20test/badge.svg?branch=main)](https://github.com/liprec/vsts-release-aas/actions?query=branch%3Amain+workflow%3A%22Build+and+test%22)       |
 | Develop | [![Build and test](https://github.com/liprec/vsts-release-aas/workflows/Build%20and%20test/badge.svg?branch=develop)](https://github.com/liprec/vsts-release-aas/actions?query=branch%3Adevelop+workflow%3A%22Build+and+test%22) |
 
-## Azure Analysis Service Deployment
+## 
 
-Visual Studio Team Service deploy task that will deploy a Tabular model to an existing Azure Analysis Service instance. Also option to change the connected source datasource during release.
-![](images/screenshot-2.png)
-
-At this moment the following configuration are tested and working:
-- Model 1400 and a single SQL Server database as datasource
-
-More configuration will follow. Feel free to contact me for a specific configuration.
-
-[More information](deploy-aas-db/README.md)
-
-## Azure Analysis Service TMSL Script
-
-This release task can be added to a release pipeline to execute a custom TMSL script against an Azure Analysis Service instance.
-![](images/screenshot-3.png)
-
-[More information](execute-aas-tmsl/README.md)
+See https://azurebi-docs.jppp.org/vsts-extensions/azure-analysis-service.html for the complete documentation.
 
 ## Release notes
+
+**1.5.0**
+- Rewritten to Powershell 5.1 (powershell.exe) and ADOMD + TOM
+- Support for Power BI Premium XMLA endpoints
+- Support for multiple datasources
+- Support for merging of roles + members and partitions
 
 **1.3.0**
 - Support for legacy datasources

@@ -1,8 +1,8 @@
 {
     "id": "a55f5b79-9828-4b7f-9528-85e9e826c028",
     "name": "deploy-aas-db",
-    "friendlyName": "Azure Analysis Service Deployment",
-    "description": "Deploy Azure Analysis Service databases",
+    "friendlyName": "Tabular Database Deployment",
+    "description": "Deploy tabular databases to Azure Analysis Services or Power BI Premium",
     "author": "Jan Pieter Posthuma",
     "helpMarkDown": "[More Information](https://github.com/liprec/vsts-release-aas)",
     "category": "Deploy",
@@ -10,13 +10,17 @@
         "Build",
         "Release"
     ],
+    "runsOn": [
+        "Agent",
+        "DeploymentGroup"
+    ],
     "demands": [
         "azureps"
     ],
     "version": {
         "Major": "1",
-        "Minor": "3",
-        "Patch": "6"
+        "Minor": "5",
+        "Patch": "0"
     },
     "minimumAgentVersion": "2.115.0",
     "groups": [
@@ -53,40 +57,61 @@
     ],
     "inputs": [
         {
-            "name": "ConnectedServiceNameSelector",
+            "name": "connectedServiceNameSelector",
+            "aliases": [
+                "ConnectedServiceNameSelector"
+            ],
             "type": "pickList",
-            "label": "Azure Connection Type",
+            "label": "Service Connection Type",
             "required": true,
             "helpMarkDown": "",
             "defaultValue": "ConnectedServiceNameARM",
             "options": {
-                "ConnectedServiceNameARM": "Azure Resource Manager"
+                "connectedServiceNameARM": "Azure Resource Manager",
+                "connectedServiceNamePBI": "Power BI"
             },
             "groupname": "azure"
         },
         {
-            "name": "ConnectedServiceNameARM",
+            "name": "connectedServiceNameARM",
+            "aliases": [
+                "ConnectedServiceNameARM"
+            ],
             "type": "connectedService:AzureRM",
-            "label": "Azure RM Subscription",
+            "label": "Service Connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Select the Azure Resource Manager subscription.",
+            "helpMarkDown": "Select the Service Connection to the Azure Analysis Services",
+            "visibleRule": "connectedServiceNameSelector = connectedServiceNameARM",
+            "groupname": "azure"
+        },
+        {
+            "name": "connectedServiceNamePBI",
+            "type": "connectedService:powerplatform-spn",
+            "label": "Service Connection",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Select the Service Connection to the Power BI tenant.\n\nInstall [Power Platform Build Tools](https://marketplace.visualstudio.com/items?itemName=microsoft-IsvExpTools.PowerPlatform-BuildTools) for the service connection",
+            "visibleRule": "connectedServiceNameSelector = connectedServiceNamePBI",
             "groupname": "azure"
         },
         {
             "name": "aasServer",
             "type": "string",
-            "label": "Analysis Services name",
+            "label": "Analysis Services URL",
             "defaultValue": "",
             "required": "true",
-            "helpMarkDown": "Azure Analysis Services name, like 'asazure://westeurope.asazure.windows.net/fabrikam'.",
+            "helpMarkDown": "URL for either Azure Analysis Services or Power BI Premium Connection.\n\nExample: 'asazure://westeurope.asazure.windows.net/fabrikam' or 'powerbi://api.powerbi.com/v1.0/myorg/fabrikam'",
             "groupname": "aas"
         },
         {
-            "name": "modelName",
+            "name": "databaseName",
+            "aliases": [
+                "modelName"
+            ],
             "type": "string",
-            "label": "Model Name",
-            "helpMarkDown": "Name of the Analysis Services Model, where the file will be deployed.",
+            "label": "Database Name",
+            "helpMarkDown": "Name of the Tabular database",
             "groupname": "aas"
         },
         {
@@ -97,7 +122,8 @@
             "groupname": "aas",
             "options": {
                 "user": "Named user",
-                "spn": "Service Principal"
+                "spn": "Service Principal",
+                "inherit": "Inherit from connection"
             }
         },
         {
@@ -123,7 +149,7 @@
             "label": "Application Key",
             "required": true,
             "visibleRule": "loginType = spn",
-            "helpMarkDown": "Key for the Service Principal. It can accept variable defined in Build/Release Definitions as e.g. '$(spkey). You may mark the variable type as 'secret' to secure it.",
+            "helpMarkDown": "Key for the Service Principal. It can accept variable defined in Build/Release Definitions as e.g. '$(spkey). You may mark the variable type as 'secret' to secure it",
             "groupname": "aas"
         },
         {
@@ -141,31 +167,56 @@
             "label": "Analysis Services Admin Password",
             "required": true,
             "visibleRule": "loginType = user",
-            "helpMarkDown": "Password for the Analysis Services Admin. It can accept variable defined in Build/Release Definitions as e.g. '$(passwordVariable). You may mark the variable type as 'secret' to secure it.",
+            "helpMarkDown": "Password for the Analysis Services Admin. It can accept variable defined in Build/Release Definitions as e.g. '$(passwordVariable). You may mark the variable type as 'secret' to secure it",
             "groupname": "aas"
         },
         {
             "name": "pathToModel",
             "type": "filePath",
             "label": "Model file",
-            "helpMarkDown": "Location of the 'asdatabase' file on the automation agent or on an UNC path accessible to the automation agent.",
+            "helpMarkDown": "Location of the '.asdatabase'/'.bim' file",
             "groupname": "deployment"
+        },
+        {
+            "name": "partitionDeployment",
+            "type": "pickList",
+            "label": "Partition Deployment",
+            "helpMarkDown": "Determine how existing partitions are treated during deployment.\n\n- Deploy partitions: any existing partitions will be replaces\n- Retain partitions: partitions of new tables will be deployed, but partitions for existing tables will be unaffected",
+            "groupname": "deployment",
+            "options": {
+                "deploypartitions": "Deploy partitions",
+	            "retainpartitions": "Retain partitions"
+            }
+        },
+        {
+            "name": "roleDeployment",
+            "type": "pickList",
+            "label": "Role Deployment",
+            "helpMarkDown": "Determine how security roles and role members are treated during deployment.\n\n- Deploy roles and members: any existing roles and members will be replaced\n- Deploy roles and retain members: roles will be deployed along with their members for new roles. Members for existing roles will be retained\n- Retain roles and members: the roles and members will not be deployed",
+            "groupname": "deployment",
+            "options": {
+                "deployrolesandmembers": "Deploy roles and members",
+	            "deployrolesretainmembers": "Deploy roles and retain members",
+	            "retainroles": "Retain roles and members"
+            }
         },
         {
             "name": "connectionType",
             "type": "pickList",
             "label": "Data Source Type",
+            "helpMarkDown": "Select how to connect the datasource(s) to their souces. Not applicable if target is Power BI Premium",
             "groupname": "dsConnection",
             "options": {
                 "none": "None",
-                "sql": "Azure SQL"
+                "sql": "Azure SQL (single connection)",
+                "advanced": "Advanced (multiple connections)"
             }
         },
         {
             "name": "sourceSQLServer",
             "type": "string",
             "label": "Source Azure SQL Server Name",
-            "helpMarkDown": "Azure SQL Server name, like fabrikam.database.windows.net,1433 or fabrikam.database.windows.net.",
+            "helpMarkDown": "Azure SQL Server name, like fabrikam.database.windows.net,1433 or fabrikam.database.windows.net",
             "groupname": "dsConnection",
             "visibleRule": "connectionType = sql"
         },
@@ -173,7 +224,7 @@
             "name": "sourceSQLDatabase",
             "type": "string",
             "label": "Source Database Name",
-            "helpMarkDown": "Name of the Azure SQL Database, where the files will be deployed.",
+            "helpMarkDown": "Name of the Azure SQL Database, where the files will be deployed",
             "groupname": "dsConnection",
             "visibleRule": "connectionType = sql"
         },
@@ -189,22 +240,32 @@
             "name": "sourceSQLPassword",
             "type": "string",
             "label": "Source Password",
-            "helpMarkDown": "Password for the Azure SQL Server user. It can accept variable defined in Build/Release Definitions as '$(passwordVariable)'. You may mark the variable type as 'secret' to secure it.",
+            "helpMarkDown": "Password for the Azure SQL Server user. It can accept variable defined in Build/Release Definitions as '$(passwordVariable)'. You may mark the variable type as 'secret' to secure it",
             "groupname": "dsConnection",
             "visibleRule": "connectionType = sql"
+        },
+        {
+            "name": "datasources",
+            "type": "multiLine",
+            "label": "Advanced datasource security settings",
+            "required": false,
+            "defaultValue": "[\n  {\n    \"name\": \"<DataSourceName>\",\n    \"authenticationKind\": \"UsernamePassword\",\n    \"connectionDetails\": {\n      \"address\": {\n        \"server\": \"<ServerName>\",\n        \"database\": \"<DatabaseName>\"\n      }\n    },\n    \"credential\": {\n      \"Username\": \"<UserName>\",\n      \"Password\": \"<Password>\"\n    }\n  }\n]",
+            "helpMarkDown": "JSON structure with datasource 'connectionDetails' and 'credentials'",
+            "groupname": "dsConnection",
+            "visibleRule": "connectionType = advanced"
         },
         {
             "name": "ipDetectionMethod",
             "type": "pickList",
             "label": "Specify Firewall Rules Using",
-            "required": true,
+            "required": false,
             "groupName": "firewall",
             "defaultValue": "autoDetect",
             "options": {
                 "autoDetect": "Auto Detect",
                 "ipAddressRange": "IP Address Range"
             },
-            "helpMarkDown": "For successful execution of the task, we need to enable administrators to access the Azure Database for MySQL Server from the IP Address of the automation agent.<br>By selecting auto-detect you can automatically add firewall exception for range of possible IP Address of automation agent ​or else you can specify the range explicitly."
+            "helpMarkDown": "For successful execution of the task, we need to enable administrators to access the Azure Analysis Services from the IP Address of the automation agent.<br>By selecting auto-detect you can automatically add firewall exception for range of possible IP Address of automation agent ​or else you can specify the range explicitly"
         },
         {
             "name": "startIpAddress",
@@ -214,7 +275,7 @@
             "groupName": "firewall",
             "defaultValue": "",
             "visibleRule": "ipDetectionMethod = ipAddressRange",
-            "helpMarkDown": "The starting IP Address of the automation agent machine pool like 196.21.30.50 ."
+            "helpMarkDown": "The starting IP Address of the automation agent machine pool like 196.21.30.50 "
         },
         {
             "name": "endIpAddress",
@@ -224,7 +285,7 @@
             "groupName": "firewall",
             "defaultValue": "",
             "visibleRule": "ipDetectionMethod = ipAddressRange",
-            "helpMarkDown": "The ending IP Address of the automation agent machine pool like 196.21.30.65 ."
+            "helpMarkDown": "The ending IP Address of the automation agent machine pool like 196.21.30.65"
         },
         {
             "name": "deleteFirewallRule",
@@ -233,7 +294,7 @@
             "required": false,
             "groupName": "firewall",
             "defaultValue": "true",
-            "helpMarkDown": "If selected, the added exception for IP addresses of the automation agent will be removed for corresponding Azure Database for MySQL."
+            "helpMarkDown": "If selected, the added exception for IP addresses of the automation agent will be removed for corresponding Azure Analysis Services"
         },
         {
             "name": "overwrite",
@@ -241,7 +302,7 @@
             "label": "Overwrite",
             "defaultValue": "true",
             "required": false,
-            "helpMarkDown": "Overwrites the existing model",
+            "helpMarkDown": "[DEPRECATED] Not used anymore",
             "groupName": "advanced"
         },
         {
@@ -250,7 +311,7 @@
             "label": "Remove before Deploy",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Remove the model before a new deployment",
+            "helpMarkDown": "[DEPRECATED] Not used anymore",
             "groupName": "advanced"
         },
         {
@@ -267,7 +328,7 @@
                 "otherVersion": "Specify other version"
             },
             "groupName": "advanced",
-            "helpMarkDown": "In case of hosted agents, the supported Azure PowerShell Version is: 1.0.0(Hosted VS2017 Queue).\nTo pick the latest version available on the agent, select \"Latest installed version\".\n\nFor private agents you can specify preferred version of Azure PowerShell using \"Specify version\""
+            "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         },
         {
             "name": "customTargetAzurePs",
@@ -280,21 +341,20 @@
             "required": true,
             "visibleRule": "targetAzurePs = otherVersion",
             "groupName": "advanced",
-            "helpMarkDown": "Preferred Azure PowerShell Version needs to be a proper semantic version eg. 1.2.3. Regex like 2.\\*,2.3.\\* is not supported. The Hosted VS2017 Pool currently supports Az module version: 1.0.0"
+            "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         }
     ],
     "dataSourceBindings": [
         {
             "target": "resourceGroupName",
-            "endpointId": "$(ConnectedServiceNameARM)",
+            "endpointId": "$(connectedServiceNameARM)",
             "dataSourceName": "AzureResourceGroups"
         }
     ],
-    "instanceNameFormat": "Deploy model to $(aasServer)",
+    "instanceNameFormat": "Deploy tabular model to $(aasServer)",
     "execution": {
         "PowerShell3": {
-            "target": "$(currentDirectory)\\deploy-aas-db.ps1",
-            "workingDirectory": "$(currentDirectory)"
+            "target": "deploy-aas-db.ps1"
         }
     }
 }

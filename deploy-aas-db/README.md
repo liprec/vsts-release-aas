@@ -1,56 +1,143 @@
 # Azure Analysis Service deployment
 
-Visual Studio Team Service deploy task that will deploy a Azure Analysis Service Model to an existing Azure Analysis Service. 
-![](../images/screenshot-2.png)
+Azure DevOps pipeline task that will deploy a Tabular Model to an existing Azure Analysis Service or Power BI Premium dataset. 
 
-*NOTE: At this moment the task only supports 1 SQL Server connection*
-*Support for more types of connection is in development*
+```yml
+- task: deploy-aas-db@1
+  inputs:
+    connectedServiceNameSelector: 'connectedServiceNameARM | connectedServiceNamePBI'
+    connectedServiceNameARM: 'service connection to AAS' # connectedServiceNameSelector = 'connectedServiceNameARM'
+    connectedServiceNamePBI: 'service connection to PBI' #  connectedServiceNameSelector = 'connectedServiceNamePBI'
+    aasServer: 'asazure://westeurope.asazure.windows.net/fabrikam | powerbi://api.powerbi.com/v1.0/myorg/dataset'
+    databaseName: 'database'
+    loginType: 'inherit | spn | user'
+    tenantId: 'tenantId'      # loginType = 'spn'
+    appId: 'appId'            # loginType = 'spn'
+    appKey: 'appKey'          # loginType = 'spn'
+    adminName: "username"     # loginType = 'user'
+    adminPassword: "password" # loginType = 'user'
+    pathToModel: './model.bim'
+    partitionDeployment: 'retainpartitions | deploypartitions'
+    roleDeployment: 'deployrolesandmembers | deployrolesretainmembers | retainroles'
+    connectionType: 'none | advanced | sql'
+    datasources: | # connectionType = 'advanced'
+      [
+        {
+          "name": "<datasetname>",
+          "authenticationKind": "UsernamePassword",
+          "connectionDetails": {
+            "address": {
+              "server": "<sqlserver>",
+              "database": "<databasename>"
+            }
+          },
+          "credential": {
+            "Username": "<username>",
+            "Password": "<password>"
+          }
+        }
+      ]
+    sourceSQLServer: 'SQLServer'  # connectionType = 'sql'
+    sourceSQLDatabase: 'Database' # connectionType = 'sql'
+    sourceSQLUsername: 'Username' # connectionType = 'sql'
+    sourceSQLPassword: 'Password' # connectionType = 'sql'
+    ipDetectionMethod: "autoDetect | ipAddressRange"
+    startIpAddress: "10.0.0.1" # ipDetectionMethod = 'ipAddressRange' 
+    endIpAddress: "10.0.0.1"   # ipDetectionMethod = 'ipAddressRange'
+    deleteFirewallRule: "true | false"
+```
 
 ## Parameters
 
 Azure Details:
-- **Azure Connection Type** - Only Azure Resource Manager is supported
-- **Azure RM Subscription** - Which Azure Subscription (Service Endpoint) should be used to connect to the datafactory
-- **Resource Group** - To which Resource Group is the Azure Analysis Service model deployed
+- **connectedServiceNameSelector** - Type of service connection to use
+    - `connectedServiceNameARM`: Use an Azure Resource Manager service connection
+    - `connectedServiceNamePBI`: Use a Power Platform service connection, to install: [Power Platform Build Tools](https://marketplace.visualstudio.com/items?itemName=microsoft-IsvExpTools.PowerPlatform-BuildTools)
+- **connectedServiceNameARM** - Which Azure RM service connection should be used to connect to the datafactory
+- **connectedServiceNamePBI** - Which Power Platform service connection should be used to connect to the datafactory
 
 Analysis Service Details:
-- **Analysis Service name** - The name of the Azure Analysis Service server
-- **Login type** - Type of Azure Analysis Service login: Named user or Service Principal
+- **aasServer** - The name of the Azure Analysis Service server or Power BI Premium connection
+- **databaseName** - The name of the Tabular database
+- **loginType** - Type of Azure Analysis Service login:
+    - `inherit`: inherit the service principal from the service connection
+    - `spn`: using a service principal
+    - `user`: using a named user 
 
-If **Login type** option is 'Service Principal':
-- **Azure AD TenantID** - Azure ID Tenant ID
-- **Application ID** - Application ID of the Service Principal
-- **Application Key** - Key of the Application ID
+If **loginType** option is `spn`:
+- **tenantId** - Azure ID Tenant ID
+- **appId** - Application ID of the Service Principal
+- **appKey** - Key/secret of the Application ID
 
-If **Login type** option is 'Named User': 
-- **Analysis Services Admin** - The admin user use to connect to the Azure Analysis Service instance
-- **Analysis Services Admin Password** - The password of the admin user use to connect to the Azure Analysis Service instance
+If **loginType** option is `user`: 
+- **adminName** - The admin user use to connect to the Azure Analysis Service instance
+- **adminPassword** - The password of the admin user use to connect to the Azure Analysis Service instance
 
-Data Source Connection Detailss:
-- **Data Source Type** - Type of the first data source defined in the model. SQL is for now the only option.
-- **Source Azure SQL Server Name** - The servername of the Azure SQL database server
-- **Source Database Name** - The database name
-- **Source User Login** - The username used for the connection by the model for trhe connection to the source database
-- **Source Password** - The password for the given username
+Deployment Details:
+- **pathToModel** - Location of the '.asdatabase'/'.bim' file
+- **partitionDeployment** - Determine how existing partitions are treated during deployment.
+    - `deploypartitions`: any existing partitions will be replaces
+    - `retainpartitions`: partitions of new tables will be deployed, but partitions for existing tables will be unaffected
+- **roleDeployment** - Determine how security roles and role members are treated during deployment.
+    - `deployrolesandmembers`: any existing roles and members will be replaced
+    - `deployrolesretainmembers`: roles will be deployed along with their members for new roles. Members for existing roles will be retained
+    - `retainroles`: the roles and members will not be deployed
 
-Firewall:
-- **Specify Firewall Rules Using** - Auto Detect adds the IP address of the agent to the firewall rules. With the option 'IP Address Range' a start and end IP address of a range needs to be provided
-- **Start IP Address** - Start IP address of the range
-- **End IP Address** - End IP address of the range.
-- **Delete Rule After Task Ends** - Delete the firewall rule at the end of the tasks 
+Data Source Connection Details (only applicable for Azure Analysis service):
+- **connectionType** - Type of the data source configuration:
+    - `none`: no additional security configuration is needed
+    - `advanced`: addtional security configuration is provided in a JSON array.
+    - `sql`: configure the first datasource with the provided servername, databasename, username and password. Support also legacy datasource
 
-Advanced:
-- **Overwrite** - Option to overwrite existing model with the new one.
-- **Remove** - Option to remove the old model before deploying a new one.
+If **loginType** option is `advanced`:
+- **datasources**: - See sample above on the format of the JSON and model definition in the .asdatabase/.bim file
+    ```json
+        [
+          {
+            "name": "<DataSourceName>",
+            "authenticationKind": "UsernamePassword",
+            "connectionDetails": {
+              "address": {
+                "server": "<ServerName>",
+                "database": "<DatabaseName>"
+              }
+            },
+            "credential": {
+              "Username": "<UserName>",
+              "Password": "<Password>"
+            }
+          }
+        ]
+    ```
+     
+If **loginType** option is `sql`: 
+- **sourceSQLServer** - The servername of the Azure SQL database server
+- **sourceSQLDatabase** - The database name
+- **sourceSQLUsername** - The username used for the connection by the model for trhe connection to the source database
+- **sourceSQLPassword** - The password for the given username
 
-## Tested configuration
+Firewall (only applicable for Azure Analysis service):
+- **ipDetectionMethod** - How to determine the IP address that needs to be added to the firewall to enable a connection
+    - `autoDetect`: adds the IP address of the agent to the firewall rules
+    - `ipAddressRange`: Manual provide the IP Address Range to be added to the firewall rules.
+- **deleteFirewallRule** - Delete the firewall rule at the end of the tasks 
 
-At this moment the following configuration are tested and working:
-- Model 1400 and a single SQL Server database as datasource
+If **ipDetectionMethod** option is `ipAddressRange`:
+- **startIpAddress** - Start IP address of the range
+- **endIpAddress** - End IP address of the range.
 
-More configuration will follow. Feel free to contact me for a specific configuration.
+# Power BI Premium Data Source Connection Details
+
+Setting datasource credentials via metadata is not possible for Power BI datasets, see: https://docs.microsoft.com/en-us/power-bi/admin/service-premium-connect-tools#setting-data-source-credentials
+To set Power BI datasource credentials either vai the UI or via the Power BI REST APIs. 
 
 ## Release notes
+
+**1.5.0**
+- Rewritten to Powershell 5.1 (powershell.exe) and ADOMD + TOM
+- Support for Power BI Premium XMLA endpoints
+- Support for multiple datasources
+- Support for merging of roles + members and partitions
 
 **1.3.0**
 - Support for legacy datasources

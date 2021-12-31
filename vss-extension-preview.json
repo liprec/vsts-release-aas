@@ -1,14 +1,14 @@
 {
     "manifestVersion": 1,
     "id": "vsts-release-aas-preview",
-    "version": "1.3.6",
-    "name": "Azure Analysis Service (Preview)",
+    "version": "1.5.0",
+    "name": "Analysis Service (Preview)",
     "publisher": "liprec",
     "public": false,
-    "description": "This extension adds release tasks related to Azure Analysis Service: deploy model and execute TMSL script",
+    "description": "This extension adds Azure DevOps pipeline tasks for Azure Analysis Service or Power BI Premium: deploy model and execute TMSL script",
     "targets": [
         {
-            "id": "Microsoft.VisualStudio.Services.Cloud"
+            "id": "Microsoft.VisualStudio.Services"
         }
     ],
     "icons": {
@@ -19,7 +19,7 @@
         { "path": "images/screenshot-1.png" }
     ],
     "categories": [
-        "Build and release"
+        "Azure Pipelines"
     ],
     "tags": [
         "azure",
@@ -27,6 +27,10 @@
         "aas",
         "azure analysis service",
         "analysis service",
+        "power bi",
+        "power bi premium",
+        "powerbi",
+        "xmla",
         "tmsl"
     ],
     "scopes": [

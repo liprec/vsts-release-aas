@@ -1,11 +1,11 @@
 {
     "manifestVersion": 1,
     "id": "vsts-release-aas",
-    "version": "1.3.6",
+    "version": "1.5.0",
     "name": "Azure Analysis Service",
     "publisher": "liprec",
     "public": true,
-    "description": "This extension adds release tasks related to Azure Analysis Service: deploy model and execute TMSL script",
+    "description": "This extension adds Azure DevOps pipeline tasks for Azure Analysis Service or Power BI Premium: deploy model and execute TMSL script",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services.Cloud"
@@ -27,6 +27,10 @@
         "aas",
         "azure analysis service",
         "analysis service",
+        "power bi",
+        "power bi premium",
+        "powerbi",
+        "xmla",
         "tmsl"
     ],
     "scopes": [
