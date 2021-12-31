@@ -1,4 +1,4 @@
-# Azure Analysis Service
+# Analysis Service pipeline extension
 
 This extension adds Azure DevOps pipeline tasks for Azure Analysis Service or Power BI Premium
 
