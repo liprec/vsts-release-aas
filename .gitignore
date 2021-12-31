@@ -216,3 +216,12 @@ ModelManifest.xml
 
 # Visual Studio Addins
 *.vsix
+
+# Exclude local test scripts
+deploy-aas-db/*
+!deploy-aas-db/README.md
+!deploy-aas-db/*/
+
+execute-aas-tmsl/*
+!execute-aas-tmsl/README.md
+!execute-aas-tmsl/*/

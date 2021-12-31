@@ -1,279 +1,103 @@
-<#
-.SYNOPSIS
-Short description
+function LoadDlls {
+    [CmdletBinding()]
+    param([string] [Parameter(Mandatory = $true)] $path)
 
-.DESCRIPTION
-Long description
-
-.PARAMETER Server
-Parameter description
-
-.PARAMETER Script
-Parameter description
-
-.PARAMETER LoginType
-Parameter description
-
-.PARAMETER Credentials
-Parameter description
-
-.EXAMPLE
-An example
-
-.NOTES
-General notes
-#>
-function ExecuteScript($Server, $Script, $LoginType, $Credentials) {
-    try {
-        switch ($LoginType) {
-            "user" {
-                $result = Invoke-ASCmd -Server $Server -Query $Script -Credential $Credentials
-            }
-            "spn" {
-                $result = Invoke-ASCmd -Server $Server -Query $Script
-            }
-        }
-        return ProcessMessages($result)
-    } catch {
-        $errMsg = $_.exception.message
-        throw "Error during deploying the model ($errMsg)"
-    }
-}
-
-<#
-.SYNOPSIS
-Short description
-
-.DESCRIPTION
-Long description
-
-.PARAMETER Server
-Parameter description
-
-.PARAMETER ScriptFile
-Parameter description
-
-.PARAMETER LoginType
-Parameter description
-
-.PARAMETER Credentials
-Parameter description
-
-.EXAMPLE
-An example
-
-.NOTES
-General notes
-#>
-function ExecuteScriptFile($Server, $ScriptFile, $LoginType, $Credentials) {
-    try {
-        switch ($LoginType) {
-            "user" {
-                $result = Invoke-ASCmd -Server $Server -InputFile $ScriptFile -Credential $Credentials
-            }
-            "spn" {                
-                $result = Invoke-ASCmd -Server $Server -InputFile $ScriptFile
-            }
-        }
-        return ProcessMessages($result)
-    } catch {
-        $errMsg = $_.exception.message
-        throw "Error during deploying the model ($errMsg)"
-    }
-}
-
-<#
-.SYNOPSIS
-Short description
-
-.DESCRIPTION
-Long description
-
-.PARAMETER result
-Parameter description
-
-.EXAMPLE
-An example
-
-.NOTES
-General notes
-#>
-function ProcessMessages($result) {
-    $return = 0
-    $resultXml = [Xml]$result
-    $messages = $resultXml.return.root.Messages
+    $binaryModuleRoot = Join-Path -Path $path -ChildPath 'assemblies'
     
-    foreach($message in $messages) {
-        $err = $message.Error
-        if ($err) {
-            $return = -1
-            $errCode = $err.errorcode
-            $errMsg = $err.Description
-            Write-Host "##vso[task.logissue type=error;]Error: $errMsg (ErrorCode: $errCode)"
-        }
-        $warn = $message.Warning
-        if ($warn) {
-            if ($return -eq 0) {
-                $return = 1
-            }
-            $warnCode = $warn.WarningCode
-            $warnMsg = $warn.Description
-            Write-Host "##vso[task.logissue type=warning;]Warning: $warnMsg (WarnCode: $warnCode)"
+    $amoDlls = @(   'Microsoft.AnalysisServices.Runtime.Core.dll',
+                    
+                    'Microsoft.AnalysisServices.Core.dll',
+                    'Microsoft.AnalysisServices.dll',
+                    'Microsoft.AnalysisServices.Tabular.dll',
+                    'Microsoft.AnalysisServices.Tabular.Json.dll')
+
+    $amoDlls | ForEach-Object {
+        $binaryPath = Join-Path -Path $binaryModuleRoot -ChildPath "$_"
+        
+        if (Test-Path -Path $binaryPath) {
+            Write-Verbose "Loading assembly: $binaryPath"
+            Add-Type -Path $binaryPath
         }
     }
-
-    return $return
 }
+function Get-AnalysisServieServer {
+    [CmdletBinding()]
+    param([string] [Parameter(Mandatory = $true)] $server,
+        [ValidateNotNull()]
+        [System.Management.Automation.PSCredential]
+        [System.Management.Automation.Credential()]
+        $credential = [System.Management.Automation.PSCredential]::Empty)
+    
+    Write-Verbose "Connecting to Analysis Service server: '$server'"
 
-<#
-.SYNOPSIS
-Short description
+    $pass = $credential.GetNetworkCredential().Password
+    $userID = ("{0}@{1}" -f $credential.GetNetworkCredential().UserName, $credential.GetNetworkCredential().Domain)
+    $tabularServer = New-Object Microsoft.AnalysisServices.Tabular.Server
 
-.DESCRIPTION
-Long description
-
-.PARAMETER Server
-Parameter description
-
-.PARAMETER TenantId
-Parameter description
-
-.PARAMETER Credentials
-Parameter description
-
-.EXAMPLE
-An example
-
-.NOTES
-General notes
-#>
-function SetASContext($Server, $TenantId, $Credentials) {
-    $environment = $Server.Split('/')[2];
-    $result = Add-AzureAnalysisServicesAccount -Credential $Credentials -ServicePrincipal -TenantId $TenantId -RolloutEnvironment $environment
-}
-
-<#
-.SYNOPSIS
-Short description
-
-.DESCRIPTION
-Long description
-
-.PARAMETER Server
-Parameter description
-
-.PARAMETER Credentials
-Parameter description
-
-.PARAMETER AzContext
-Parameter description
-
-.PARAMETER IpDetectionMethod
-Parameter description
-
-.PARAMETER StartIPAddress
-Parameter description
-
-.PARAMETER EndIPAddress
-Parameter description
-
-.EXAMPLE
-An example
-
-.NOTES
-General notes
-#>
-function AddCurrentServerToASFirewall($Server, $Credentials, $AzContext, $IpDetectionMethod , $StartIPAddress, $EndIPAddress) {
-    $qry = "<Discover xmlns='urn:schemas-microsoft-com:xml-analysis'><RequestType>DISCOVER_PROPERTIES</RequestType><Restrictions/><Properties/></Discover>"
-    $serverName = $Server.Split('/')[3].Replace(':rw','');
-    $added = $false
-    switch ($IpDetectionMethod) {
-        "ipAddressRange" {
-            $startIP = $StartIPAddress
-            $endIP = $EndIPAddress
-        }
-        "autoDetect" {
-            try {
-                if ($Credentials -eq $null) {
-                    $result = Invoke-ASCmd -Server $Server -Query $qry
-                } else {
-                    $result = Invoke-ASCmd -Server $Server -Query $qry -Credential $Credentials
-                }
-            } catch {
-                $errMsg = $_.exception.message
-                $start = $errMsg.IndexOf("Client with IP Address '") + 24
-                $length = $errMsg.IndexOf("' is not allowed to access the server.") - $start
-                if (($start -gt 24) -and ($length -ge 7)) {
-                    $startIP = $errMsg.SubString($start, $length)
-                    $endIP = $startIP
-                } else {
-                    Write-Host "##vso[task.logissue type=error;]Error during adding automatic firewall rule ($errMsg)"
-                    throw
-                }
-            }
-        }
-    }
-    if (($null -ne $startIP) -and ($null -ne $endIP)) {
-        try {
-            $added = $true
-            $currentConfig = (Get-AzureRmAnalysisServicesServer -Name $serverName -DefaultProfile $AzContext)[0].FirewallConfig
-            $currentFirewallRules = $currentConfig.FirewallRules
-            $firewallRule = New-AzureRmAnalysisServicesFirewallRule -FirewallRuleName 'vsts-release-aas-rule' -RangeStart $startIP -RangeEnd $endIP -DefaultProfile $AzContext
-            $currentFirewallRules.Add($firewallRule)
-            if ($currentConfig.EnablePowerBIService) {
-                $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -EnablePowerBIService -DefaultProfile $AzContext
-            } else {
-                $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $currentFirewallRules -DefaultProfile $AzContext
-            }
-            $result = Set-AzureRmAnalysisServicesServer -Name $serverName -FirewallConfig $firewallConfig -DefaultProfile $AzContext
-        } catch {
-            $errMsg = $_.exception.message
-            Write-Host "##vso[task.logissue type=error;]Error during adding firewall rule ($errMsg)"
-            throw
-        }
-    }
-
-    return $added
-}
-
-<#
-.SYNOPSIS
-Short description
-
-.DESCRIPTION
-Long description
-
-.PARAMETER Server
-Parameter description
-
-.PARAMETER AzContext
-Parameter description
-
-.EXAMPLE
-An example
-
-.NOTES
-General notes
-#>
-function RemoveCurrentServerFromASFirewall($Server, $AzContext, $Skip) {
-    $serverName = $Server.Split('/')[3].Replace(':rw','');
     try {
-        $currentConfig = (Get-AzureRmAnalysisServicesServer -Name $serverName -DefaultProfile $AzContext)[0].FirewallConfig
-        $newFirewallRules = $currentConfig.FirewallRules
-        $newFirewallRules.RemoveAll({ $args[0].FirewallRuleName -eq "vsts-release-aas-rule" })
-        if ($currentConfig.EnablePowerBIService) {
-            $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $newFirewallRules -EnablePowerBIService -DefaultProfile $AzContext
-        } else {
-            $firewallConfig = New-AzureRmAnalysisServicesFirewallConfig -FirewallRule $newFirewallRules -DefaultProfile $AzContext
-        }
-        $result = Set-AzureRmAnalysisServicesServer -Name $serverName -FirewallConfig $firewallConfig -DefaultProfile $AzContext
+        $tabularServer.Connect("DataSource=${server};User ID=${userID};Password=${pass}")
     } catch {
-        if ($Skip -ne $true) {
-            $errMsg = $_.exception.message
-            Write-Host "##vso[task.logissue type=error;]Error during removing firewall rule ($errMsg)"
-            throw
+        $errMsg = $_.exception.message
+        throw "Error connecting to tabular service. ($errMsg)"
+    }
+
+    return $tabularServer
+}
+
+function Get-AgentIpAddress {
+    [CmdletBinding()]
+    param([string] [Parameter(Mandatory = $true)] $server,
+        [ValidateNotNull()]
+        [System.Management.Automation.PSCredential]
+        [System.Management.Automation.Credential()]
+        $credential = [System.Management.Automation.PSCredential]::Empty)
+
+    $pass = $credential.GetNetworkCredential().Password
+    $userID = $credential.GetNetworkCredential().UserName
+    $tabularServer = New-Object Microsoft.AnalysisServices.Tabular.Server
+
+    try {
+        $tabularServer.Connect("DataSource=${server};User ID=${userID};Password=${pass}")
+    } catch {
+        $errMsg = $_.exception.message
+        $start = $errMsg.IndexOf("Client with IP Address '") + 24
+        $length = $errMsg.IndexOf("' is not allowed to access the server.") - $start
+        if (($start -gt 24) -and ($length -ge 7)) {
+            $startIP = $errMsg.SubString($start, $length)
+            $endIP = $startIP
+        } else {
+            throw "Error during detecting agent IP address ($errMsg)"
         }
     }
 
+    return $startIP, $endIP
+}
+
+function CheckQuery($tmslScript) {
+    if ($tmslScript[0] -eq '<') {
+        return $false
+    }
+    if ($tmslScript[0] -eq '{') {
+        return $false
+    }
     return $true
+}
+
+function ProcessMessages {
+    [CmdletBinding()]
+    param([Microsoft.AnalysisServices.XmlaResultCollection] [Parameter(Mandatory = $true)] $result)
+
+    $return = 0
+    if ($result.ContainsErrors) {
+        $return = -1
+        for ($i = 0; $i -lt $result.Count; $i++) {
+            $messages = $result[$i].Messages
+            foreach ($message in $messages) {
+                return $return, $message.Description
+            }
+            
+        }
+    }
+
+    return $return, ""
 }
