@@ -113,27 +113,27 @@ try {
         "tmsl" {
             Write-Verbose "Parse TMSL file"
             $fileContent = Get-Content $tmslFile
-            $command = New-Object -TypeName "System.Text.StringBuilder"
+            $command = ""
             $checkQuery = CheckQuery($fileContent)
             if ($checkQuery) {
-                [void]$command.Append("<Statement>")
+                $command += "<Statement>"
             }
-            [void]$command.Append($fileContent)
+            $command += $fileContent
             if ($checkQuery) {
-                [void]$command.Append("</Statement>")
+                $command += "</Statement>"
             }
             $commands += $command
         }
         "inline" { 
             Write-Verbose "Parse TMSL inline script"
-            $command = New-Object -TypeName "System.Text.StringBuilder"
+            $command = ""
             $checkQuery = CheckQuery($tmslScript)
             if ($checkQuery) {
-                [void]$command.Append("<Statement>")
+                $command += "<Statement>"
             }
-            [void]$command.Append($tmslScript)
+            $command += $tmslScript
             if ($checkQuery) {
-                [void]$command.Append("</Statement>")
+                $command += "</Statement>"
             }
             $commands += $command
         }
@@ -143,14 +143,14 @@ try {
             foreach ($tmslFile in $tmslFiles) {
                 $scriptFile = Join-Path -Path $tmslFolder -ChildPath $tmslFile
                 $fileContent = Get-Content $scriptFile
-                $command = New-Object -TypeName "System.Text.StringBuilder"
+                $command = ""
                 $checkQuery = CheckQuery($fileContent)
                 if ($checkQuery) {
-                    [void]$command.Append("<Statement>")
+                    $command += "<Statement>"
                 }
-                [void]$command.Append($fileContent)
+                $command += $fileContent
                 if ($checkQuery) {
-                    [void]$command.Append("</Statement>")
+                    $command += "</Statement>"
                 }
                 $commands += $command
             }
