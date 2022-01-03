@@ -112,7 +112,7 @@ try {
     switch ($queryType) {
         "tmsl" {
             Write-Verbose "Parse TMSL file"
-            $fileContent = Get-Content $tmslFile -Encoding UTF8
+            $fileContent = Get-Content -Path $tmslFile -Encoding UTF8
             $command = ""
             $checkQuery = CheckQuery($fileContent)
             if ($checkQuery) {
@@ -142,7 +142,7 @@ try {
             $tmslFiles = Get-ChildItem -Path $tmslFolder
             foreach ($tmslFile in $tmslFiles) {
                 $scriptFile = Join-Path -Path $tmslFolder -ChildPath $tmslFile
-                $fileContent = Get-Content $scriptFile -Encoding UTF8
+                $fileContent = Get-Content -Path $scriptFile -Encoding UTF8
                 $command = ""
                 $checkQuery = CheckQuery($fileContent)
                 if ($checkQuery) {
