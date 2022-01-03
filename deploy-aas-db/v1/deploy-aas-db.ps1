@@ -36,8 +36,8 @@ $sourceSQLPassword = Get-VstsInput -Name "sourceSQLPassword"
 
 $secrets = Get-VstsInput -Name "datasources"
 
-$overwrite = Get-VstsInput -Name "overwrite" -Require -AsBool
-$remove = Get-VstsInput -Name "remove" -Require -AsBool
+$overwrite = Get-VstsInput -Name "overwrite" -AsBool
+$remove = Get-VstsInput -Name "remove" -AsBool
 
 $partitionDeployment = Get-VstsInput -Name "partitionDeployment"
 $roleDeployment = Get-VstsInput -Name "roleDeployment"
@@ -80,10 +80,10 @@ if (-not ($databaseName)) {
     throw "Missing required input 'databaseName'"
 }
 
-if ($overwrite -ne $true) {
+if ($overwrite) {
     Write-Warning "The 'overwrite' option will be deprecated in a future version."
 }
-if ($remove -ne $false) {
+if ($remove) {
     Write-Warning "The 'remove' option will be deprecated in a future version."
 }
 
