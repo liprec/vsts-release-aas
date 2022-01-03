@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "vsts-release-aas-preview",
-    "version": "1.5.1",
+    "version": "1.5.1\2",
     "name": "Analysis Service (Preview)",
     "publisher": "liprec",
     "public": false,

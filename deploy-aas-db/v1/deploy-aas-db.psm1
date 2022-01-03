@@ -40,7 +40,7 @@ function LoadTabularDatabaseFromFile {
     Write-Verbose "Loading tabular database from file"
 
     try {
-        $sourceFileContent = Get-Content $path | ConvertFrom-Json
+        $sourceFileContent = Get-Content -Path $path -Encoding UTF8 | ConvertFrom-Json
         # Remove memberIds from role memberships
         $roles = $sourceFileContent.Model.Roles
         foreach($role in $roles) {
