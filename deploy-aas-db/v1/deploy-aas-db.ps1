@@ -110,6 +110,7 @@ switch ($roleDeployment.ToLower()) {
 switch ($loginType) {
     "user" {
         Write-Verbose "Retrieving user/password"
+        Write-Warning "Be adviced that the user/password authentication will be deprecated in a future version. Please switch to 'SPN' or 'inherit' option"
         $identifier = Get-VstsInput -Name "adminName" -Require
         $secret = ConvertTo-SecureString -String (Get-VstsInput -Name "adminPassword" -Require) -AsPlainText -Force
     }
