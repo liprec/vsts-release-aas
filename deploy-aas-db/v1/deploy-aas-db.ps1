@@ -34,7 +34,7 @@ $sourceSQLDatabase = Get-VstsInput -Name "sourceSQLDatabase"
 $sourceSQLUsername = Get-VstsInput -Name "sourceSQLUsername"
 $sourceSQLPassword = Get-VstsInput -Name "sourceSQLPassword"
 
-$secrets = Get-VstsInput -Name "datasources"
+$secrets = Get-VstsInput -Name "datasources" | ConvertFrom-Json
 
 $overwrite = Get-VstsInput -Name "overwrite" -AsBool
 $remove = Get-VstsInput -Name "remove" -AsBool
@@ -110,6 +110,7 @@ switch ($roleDeployment.ToLower()) {
 switch ($loginType) {
     "user" {
         Write-Verbose "Retrieving user/password"
+        Write-Warning "Be adviced that the user/password authentication will be deprecated in a future version. Please switch to 'SPN' or 'inherit' option"
         $identifier = Get-VstsInput -Name "adminName" -Require
         $secret = ConvertTo-SecureString -String (Get-VstsInput -Name "adminPassword" -Require) -AsPlainText -Force
     }
@@ -162,7 +163,8 @@ try {
     $currentDatabase, $server = LoadTabularDatabaseFromServer -server $aasServer -database $databaseName -credential $credential
     
     if (-not $isPBI) {
-        if (("" -eq $secrets) -and ("" -ne $sourceSQLServer)) {
+        if (($secrets[0].name -eq "<DataSourceName>") -and ($sourceSQLServer)) {
+            Write-Verbose "Using 'Azure SQL (single connection)' details"
             $dataSourceName = $sourceDatabase.Model.DataSources[0].Name
             $secrets = "[{
                 'name': '$dataSourceName',

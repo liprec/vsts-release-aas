@@ -31,7 +31,11 @@ function Get-AnalysisServieServer {
     Write-Verbose "Connecting to Analysis Service server: '$server'"
 
     $pass = $credential.GetNetworkCredential().Password
-    $userID = ("{0}@{1}" -f $credential.GetNetworkCredential().UserName, $credential.GetNetworkCredential().Domain)
+    if ($credential.GetNetworkCredential().Domain -ne "") {
+        $userID = ("{0}@{1}" -f $credential.GetNetworkCredential().UserName, $credential.GetNetworkCredential().Domain)
+    } else {
+        $userID = $credential.GetNetworkCredential().UserName
+    }
     $tabularServer = New-Object Microsoft.AnalysisServices.Tabular.Server
 
     try {
@@ -53,7 +57,11 @@ function Get-AgentIpAddress {
         $credential = [System.Management.Automation.PSCredential]::Empty)
 
     $pass = $credential.GetNetworkCredential().Password
-    $userID = $credential.GetNetworkCredential().UserName
+    if ($credential.GetNetworkCredential().Domain -ne "") {
+        $userID = ("{0}@{1}" -f $credential.GetNetworkCredential().UserName, $credential.GetNetworkCredential().Domain)
+    } else {
+        $userID = $credential.GetNetworkCredential().UserName
+    }
     $tabularServer = New-Object Microsoft.AnalysisServices.Tabular.Server
 
     try {
