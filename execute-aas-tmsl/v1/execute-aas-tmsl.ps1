@@ -15,15 +15,18 @@ $loginType = Get-VstsInput -Name "loginType" -Require
 
 $queryType = Get-VstsInput -Name "queryType" -Require
 if ($queryType -eq "tsml") { 
+    Write-Warning "The 'queryType: tsml' option will be deprecated in a future version."
     $queryType = "tmsl"
 }
 
 $tmslFile = Get-VstsInput -Name "tmslFile"
 if (-not ($tmslFile)) {
+    Write-Warning "The 'tsmlFile' option will be deprecated in a future version."
     $tmslFile = Get-VstsInput -Name "tsmlFile"     # keep typo due to breaking changes
 }
 $tmslScript = Get-VstsInput -Name "tmslScript"
 if (-not ($tmslScript)) {
+    Write-Warning "The 'tsmlScript' option will be deprecated in a future version."
     $tmslScript = Get-VstsInput -Name "tsmlScript" # keep typo due to breaking changes
 }
 $tmslFolder = Get-VstsInput -Name "tmslFolder"

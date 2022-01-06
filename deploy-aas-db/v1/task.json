@@ -20,7 +20,7 @@
     "version": {
         "Major": "1",
         "Minor": "5",
-        "Patch": "4"
+        "Patch": "5"
     },
     "minimumAgentVersion": "2.115.0",
     "groups": [
@@ -53,13 +53,18 @@
             "name": "advanced",
             "displayName": "Advanced",
             "isExpanded": false
+        },
+        {
+            "name": "old",
+            "displayName": "Deprecated inputs",
+            "isExpanded": false
         }
     ],
     "inputs": [
         {
-            "name": "connectedServiceNameSelector",
+            "name": "ConnectedServiceNameSelector",
             "aliases": [
-                "ConnectedServiceNameSelector"
+                "connectedServiceNameSelector"
             ],
             "type": "pickList",
             "label": "Service Connection Type",
@@ -73,16 +78,16 @@
             "groupname": "azure"
         },
         {
-            "name": "connectedServiceNameARM",
+            "name": "ConnectedServiceNameARM",
             "aliases": [
-                "ConnectedServiceNameARM"
+                "connectedServiceNameARM"
             ],
             "type": "connectedService:AzureRM",
             "label": "Service Connection",
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Select the Service Connection to the Azure Analysis Services",
-            "visibleRule": "connectedServiceNameSelector = connectedServiceNameARM",
+            "visibleRule": "ConnectedServiceNameSelector = connectedServiceNameARM",
             "groupname": "azure"
         },
         {
@@ -92,7 +97,7 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "Select the Service Connection to the Power BI tenant.\n\nInstall [Power Platform Build Tools](https://marketplace.visualstudio.com/items?itemName=microsoft-IsvExpTools.PowerPlatform-BuildTools) for the service connection",
-            "visibleRule": "connectedServiceNameSelector = connectedServiceNamePBI",
+            "visibleRule": "ConnectedServiceNameSelector = connectedServiceNamePBI",
             "groupname": "azure"
         },
         {
@@ -106,9 +111,6 @@
         },
         {
             "name": "databaseName",
-            "aliases": [
-                "modelName"
-            ],
             "type": "string",
             "label": "Database Name",
             "helpMarkDown": "Name of the Tabular database",
@@ -297,13 +299,20 @@
             "helpMarkDown": "If selected, the added exception for IP addresses of the automation agent will be removed for corresponding Azure Analysis Services"
         },
         {
+            "name": "modelName",
+            "type": "string",
+            "label": "Old variable containing 'modelName'",
+            "helpMarkDown": "[DEPRECATED] Not used anymore, please use 'databaseName'",
+            "groupname": "old"
+        },
+        {
             "name": "overwrite",
             "type": "boolean",
             "label": "Overwrite",
             "defaultValue": "true",
             "required": false,
             "helpMarkDown": "[DEPRECATED] Not used anymore",
-            "groupName": "advanced"
+            "groupName": "old"
         },
         {
             "name": "remove",
@@ -312,7 +321,7 @@
             "defaultValue": "false",
             "required": false,
             "helpMarkDown": "[DEPRECATED] Not used anymore",
-            "groupName": "advanced"
+            "groupName": "old"
         },
         {
             "name": "targetAzurePs",
@@ -327,7 +336,7 @@
                 "latestVersion": "Latest installed version",
                 "otherVersion": "Specify other version"
             },
-            "groupName": "advanced",
+            "groupName": "old",
             "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         },
         {
@@ -340,7 +349,7 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "targetAzurePs = otherVersion",
-            "groupName": "advanced",
+            "groupName": "old",
             "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         }
     ],

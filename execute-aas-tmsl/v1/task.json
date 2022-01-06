@@ -16,7 +16,7 @@
     "version": {
         "Major": "1",
         "Minor": "5",
-        "Patch": "4"
+        "Patch": "5"
     },
     "minimumAgentVersion": "2.115.0",
     "groups": [
@@ -44,13 +44,18 @@
             "name": "advanced",
             "displayName": "Advanced",
             "isExpanded": false
+        },
+        {
+            "name": "old",
+            "displayName": "Deprecated inputs",
+            "isExpanded": false
         }
     ],
     "inputs": [
         {
-            "name": "connectedServiceNameSelector",
+            "name": "ConnectedServiceNameSelector",
             "aliases": [
-                "ConnectedServiceNameSelector"
+                "connectedServiceNameSelector"
             ],
             "type": "pickList",
             "label": "Service Connection Type",
@@ -64,16 +69,16 @@
             "groupname": "azure"
         },
         {
-            "name": "connectedServiceNameARM",
+            "name": "ConnectedServiceNameARM",
             "aliases": [
-                "ConnectedServiceNameARM"
+                "connectedServiceNameARM"
             ],
             "type": "connectedService:AzureRM",
             "label": "Service Connection",
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Select the Service Connection to the Azure Analysis Services",
-            "visibleRule": "connectedServiceNameSelector = connectedServiceNameARM",
+            "visibleRule": "ConnectedServiceNameSelector = connectedServiceNameARM",
             "groupname": "azure"
         },
         {
@@ -83,7 +88,7 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "Select the Service Connection to the Power BI tenant.\n\nInstall [Power Platform Build Tools](https://marketplace.visualstudio.com/items?itemName=microsoft-IsvExpTools.PowerPlatform-BuildTools) for the service connection",
-            "visibleRule": "connectedServiceNameSelector = connectedServiceNamePBI",
+            "visibleRule": "ConnectedServiceNameSelector = connectedServiceNamePBI",
             "groupname": "azure"
         },
         {
@@ -164,9 +169,6 @@
         },
         {
             "name": "tmslFile",
-            "aliases": [
-                "tsmlFile"
-            ],
             "type": "filePath",
             "label": "TMSL File",
             "helpMarkDown": "Location of the TMSL file on the automation agent or on a UNC path accessible to the automation agent like, \\\\BudgetIT\\Web\\Deploy\\Fabrikam.tmsl. Predefined system variables like, $(agent.releaseDirectory) can also be used here",
@@ -175,9 +177,6 @@
         },
         {
             "name": "tmslScript",
-            "aliases": [
-                "tsmlScript"
-            ],
             "type": "multiLine",
             "label": "Inline TMSL Script",
             "helpMarkDown": "Enter the TMSL script to execute on the Azure Analysis Service instance selected above",
@@ -235,6 +234,20 @@
             "helpMarkDown": "If selected, the added exception for IP addresses of the automation agent will be removed for corresponding Azure Analysis Services"
         },
         {
+            "name": "tsmlFile",
+            "type": "filePath",
+            "label": "Old variable containing the TMSL File",
+            "helpMarkDown": "[DEPRECATED] Not used anymore, please use 'tmslFile'",
+            "groupname": "old"
+        },
+        {
+            "name": "tsmlScript",
+            "type": "multiLine",
+            "label": "Old variable containing the TMSL inline script",
+            "helpMarkDown": "[DEPRECATED] Not used anymore, please use 'tmslScript'",
+            "groupname": "old"
+        },
+        {
             "name": "targetAzurePs",
             "aliases": [
                 "azurePowerShellVersion"
@@ -247,7 +260,7 @@
                 "latestVersion": "Latest installed version",
                 "otherVersion": "Specify other version"
             },
-            "groupName": "advanced",
+            "groupName": "old",
             "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         },
         {
@@ -260,7 +273,7 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "targetAzurePs = otherVersion",
-            "groupName": "advanced",
+            "groupName": "old",
             "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         }
     ],
