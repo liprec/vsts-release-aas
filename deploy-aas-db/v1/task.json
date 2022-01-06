@@ -87,7 +87,7 @@
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Select the Service Connection to the Azure Analysis Services",
-            "visibleRule": "connectedServiceNameSelector = connectedServiceNameARM",
+            "visibleRule": "ConnectedServiceNameSelector = connectedServiceNameARM",
             "groupname": "azure"
         },
         {
@@ -97,7 +97,7 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "Select the Service Connection to the Power BI tenant.\n\nInstall [Power Platform Build Tools](https://marketplace.visualstudio.com/items?itemName=microsoft-IsvExpTools.PowerPlatform-BuildTools) for the service connection",
-            "visibleRule": "connectedServiceNameSelector = connectedServiceNamePBI",
+            "visibleRule": "ConnectedServiceNameSelector = connectedServiceNamePBI",
             "groupname": "azure"
         },
         {
