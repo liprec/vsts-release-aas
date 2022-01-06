@@ -44,6 +44,11 @@
             "name": "advanced",
             "displayName": "Advanced",
             "isExpanded": false
+        },
+        {
+            "name": "old",
+            "displayName": "Deprecated inputs",
+            "isExpanded": false
         }
     ],
     "inputs": [
@@ -187,18 +192,6 @@
             "visibleRule": "queryType = folder"
         },
         {
-            "name": "tsmlFile",
-            "type": "filePath",
-            "label": "Old variable containing the TMSL File",
-            "groupname": "advanced"
-        },
-        {
-            "name": "tsmlScript",
-            "type": "multiLine",
-            "label": "Old variable containing the TMSL inline script",
-            "groupname": "advanced"
-        },
-        {
             "name": "ipDetectionMethod",
             "type": "pickList",
             "label": "Specify Firewall Rules Using",
@@ -241,6 +234,20 @@
             "helpMarkDown": "If selected, the added exception for IP addresses of the automation agent will be removed for corresponding Azure Analysis Services"
         },
         {
+            "name": "tsmlFile",
+            "type": "filePath",
+            "label": "Old variable containing the TMSL File",
+            "helpMarkDown": "[DEPRECATED] Not used anymore, please use 'tmslFile'",
+            "groupname": "old"
+        },
+        {
+            "name": "tsmlScript",
+            "type": "multiLine",
+            "label": "Old variable containing the TMSL inline script",
+            "helpMarkDown": "[DEPRECATED] Not used anymore, please use 'tmslScript'",
+            "groupname": "old"
+        },
+        {
             "name": "targetAzurePs",
             "aliases": [
                 "azurePowerShellVersion"
@@ -253,7 +260,7 @@
                 "latestVersion": "Latest installed version",
                 "otherVersion": "Specify other version"
             },
-            "groupName": "advanced",
+            "groupName": "old",
             "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         },
         {
@@ -266,7 +273,7 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "targetAzurePs = otherVersion",
-            "groupName": "advanced",
+            "groupName": "old",
             "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         }
     ],

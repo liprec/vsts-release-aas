@@ -53,6 +53,11 @@
             "name": "advanced",
             "displayName": "Advanced",
             "isExpanded": false
+        },
+        {
+            "name": "old",
+            "displayName": "Deprecated inputs",
+            "isExpanded": false
         }
     ],
     "inputs": [
@@ -109,12 +114,6 @@
             "type": "string",
             "label": "Database Name",
             "helpMarkDown": "Name of the Tabular database",
-            "groupname": "aas"
-        },
-        {
-            "name": "modelName",
-            "type": "string",
-            "label": "Old variable containing 'modelName'",
             "groupname": "aas"
         },
         {
@@ -300,13 +299,20 @@
             "helpMarkDown": "If selected, the added exception for IP addresses of the automation agent will be removed for corresponding Azure Analysis Services"
         },
         {
+            "name": "modelName",
+            "type": "string",
+            "label": "Old variable containing 'modelName'",
+            "helpMarkDown": "[DEPRECATED] Not used anymore, please use 'databaseName'",
+            "groupname": "old"
+        },
+        {
             "name": "overwrite",
             "type": "boolean",
             "label": "Overwrite",
             "defaultValue": "true",
             "required": false,
             "helpMarkDown": "[DEPRECATED] Not used anymore",
-            "groupName": "advanced"
+            "groupName": "old"
         },
         {
             "name": "remove",
@@ -315,7 +321,7 @@
             "defaultValue": "false",
             "required": false,
             "helpMarkDown": "[DEPRECATED] Not used anymore",
-            "groupName": "advanced"
+            "groupName": "old"
         },
         {
             "name": "targetAzurePs",
@@ -330,7 +336,7 @@
                 "latestVersion": "Latest installed version",
                 "otherVersion": "Specify other version"
             },
-            "groupName": "advanced",
+            "groupName": "old",
             "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         },
         {
@@ -343,7 +349,7 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "targetAzurePs = otherVersion",
-            "groupName": "advanced",
+            "groupName": "old",
             "helpMarkDown": "[DEPRECATED] Not used anymore. Task is running with Windows PowerShell 5.1"
         }
     ],
