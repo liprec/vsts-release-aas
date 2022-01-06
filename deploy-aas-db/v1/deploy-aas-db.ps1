@@ -16,8 +16,8 @@ enum PartitionDeployment {
 }
 
 # Get task inputs
-$connectionType = Get-VstsInput -Name connectedServiceNameSelector -Require
-$serviceName = Get-VstsInput -Name $connectionType -Require
+$connectedService = Get-VstsInput -Name connectedServiceNameSelector -Require
+$serviceName = Get-VstsInput -Name $connectedService -Require
 if ($serviceName) {
     $endpoint = Get-VstsEndpoint -Name $serviceName -Require
 }
@@ -29,12 +29,20 @@ $loginType = Get-VstsInput -Name "loginType" -Require
 
 $pathToModel = Get-VstsInput -Name "pathToModel" -Require
 
-$sourceSQLServer = Get-VstsInput -Name "sourceSQLServer"
-$sourceSQLDatabase = Get-VstsInput -Name "sourceSQLDatabase"
-$sourceSQLUsername = Get-VstsInput -Name "sourceSQLUsername"
-$sourceSQLPassword = Get-VstsInput -Name "sourceSQLPassword"
+$connectionType = Get-VstsInput -Name "connectionType"
 
-$secrets = Get-VstsInput -Name "datasources" | ConvertFrom-Json
+if ($connectionType -eq "sql") {
+    Write-Verbose "Retrieving 'sql' credentials"
+    $sourceSQLServer = Get-VstsInput -Name "sourceSQLServer"
+    $sourceSQLDatabase = Get-VstsInput -Name "sourceSQLDatabase"
+    $sourceSQLUsername = Get-VstsInput -Name "sourceSQLUsername"
+    $sourceSQLPassword = Get-VstsInput -Name "sourceSQLPassword"
+}
+
+if ($connectionType -eq "advanced") {
+    Write-Verbose "Retrieving 'advanced' credentials"
+    $secrets = Get-VstsInput -Name "datasources" | ConvertFrom-Json
+}
 
 $overwrite = Get-VstsInput -Name "overwrite" -AsBool
 $remove = Get-VstsInput -Name "remove" -AsBool
@@ -163,48 +171,50 @@ try {
     $currentDatabase, $server = LoadTabularDatabaseFromServer -server $aasServer -database $databaseName -credential $credential
     
     if (-not $isPBI) {
-        if (($secrets[0].name -eq "<DataSourceName>") -and ($sourceSQLServer)) {
-            Write-Verbose "Using 'Azure SQL (single connection)' details"
-            $dataSourceName = $sourceDatabase.Model.DataSources[0].Name
-            $secrets = "[{
-                'name': '$dataSourceName',
-                'authenticationKind': 'UsernamePassword',
-                'connectionDetails': {
-                    'address': {
-                        'server': '$sourceSQLServer',
-                        'database': '$sourceSQLDatabase'
+        if ($connectionType -ne "none") {
+            if ($connectionType -eq "sql") {
+                Write-Verbose "Using 'Azure SQL (single connection)' details"
+                $dataSourceName = $sourceDatabase.Model.DataSources[0].Name
+                $secrets = "[{
+                    'name': '$dataSourceName',
+                    'authenticationKind': 'UsernamePassword',
+                    'connectionDetails': {
+                        'address': {
+                            'server': '$sourceSQLServer',
+                            'database': '$sourceSQLDatabase'
+                        }
+                    },
+                    'credential': {
+                        'Username': '$sourceSQLUsername',
+                        'Password': '$sourceSQLPassword'
                     }
-                },
-                'credential': {
-                    'Username': '$sourceSQLUsername',
-                    'Password': '$sourceSQLPassword'
-                }
-            }]" | ConvertFrom-Json
-        }
-        foreach ($secret in $secrets) {
-            $secretName = $secret.name
-            Write-Verbose "Applying datasouce credentials for '$secretName'"
-            if ($sourceDatabase.Model.DataSources.ContainsName($secretName)) {
-                $currentDatasource = $sourceDatabase.Model.DataSources.Find($secretName)
-                if ($currentDatasource.Type -eq [Microsoft.AnalysisServices.Tabular.DataSourceType]::Structured) {
-                    $address = $secret.connectionDetails.address
-                    $address | Get-Member -MemberType NoteProperty | ForEach-Object { 
-                        $key = $_.Name
-                        $currentDatasource.connectionDetails.address["$key"] = $address."$key"
+                }]" | ConvertFrom-Json
+            }
+            foreach ($secret in $secrets) {
+                $secretName = $secret.name
+                Write-Verbose "Applying datasouce credentials for '$secretName'"
+                if ($sourceDatabase.Model.DataSources.ContainsName($secretName)) {
+                    $currentDatasource = $sourceDatabase.Model.DataSources.Find($secretName)
+                    if ($currentDatasource.Type -eq [Microsoft.AnalysisServices.Tabular.DataSourceType]::Structured) {
+                        $address = $secret.connectionDetails.address
+                        $address | Get-Member -MemberType NoteProperty | ForEach-Object { 
+                            $key = $_.Name
+                            $currentDatasource.connectionDetails.address["$key"] = $address."$key"
+                        }
+                        $credential = $secret.credential
+                        $credential | Get-Member -MemberType NoteProperty | ForEach-Object { 
+                            $key = $_.Name
+                            $currentDatasource.credential["$key"] = $credential."$key"
+                        }
+                    } else {
+                        $connectionString = $currentDatasource.connectionString
+                        $connectionStringJSON = ConvertFrom-Json ("{`"" + $connectionString.replace("=", "`":`"").replace(";", "`",`"") + "`"}")
+                        $connectionStringJSON."Data Source" = $sourceSQLServer
+                        $connectionStringJSON."Initial Catalog" = $sourceSQLDatabase
+                        $connectionStringJSON."User ID" = $sourceSQLUsername
+                        $connectionStringJSON | Add-Member -name "Password" -Value $sourceSQLPassword -MemberType NoteProperty
+                        $currentDatasource.connectionString = ($connectionStringJSON | ConvertTo-Json -Compress).replace("`":`"", "=").replace("`",`"", ";").replace("{`"", "").replace("`"}", "")
                     }
-                    $credential = $secret.credential
-                    $credential | Get-Member -MemberType NoteProperty | ForEach-Object { 
-                        $key = $_.Name
-                        $currentDatasource.credential["$key"] = $credential."$key"
-                    }
-                } else {
-                    $connectionString = $currentDatasource.connectionString
-                    $connectionStringJSON = ConvertFrom-Json ("{`"" + $connectionString.replace("=", "`":`"").replace(";", "`",`"") + "`"}")
-                    $connectionStringJSON."Data Source" = $sourceSQLServer
-                    $connectionStringJSON."Initial Catalog" = $sourceSQLDatabase
-                    $connectionStringJSON."User ID" = $sourceSQLUsername
-                    $connectionStringJSON | Add-Member -name "Password" -Value $sourceSQLPassword -MemberType NoteProperty
-                    $currentDatasource.connectionString = ($connectionStringJSON | ConvertTo-Json -Compress).replace("`":`"", "=").replace("`",`"", ";").replace("{`"", "").replace("`"}", "")
                 }
             }
         }

@@ -16,7 +16,7 @@
     "version": {
         "Major": "1",
         "Minor": "5",
-        "Patch": "4"
+        "Patch": "5"
     },
     "minimumAgentVersion": "2.115.0",
     "groups": [
@@ -48,9 +48,9 @@
     ],
     "inputs": [
         {
-            "name": "connectedServiceNameSelector",
+            "name": "ConnectedServiceNameSelector",
             "aliases": [
-                "ConnectedServiceNameSelector"
+                "connectedServiceNameSelector"
             ],
             "type": "pickList",
             "label": "Service Connection Type",
@@ -64,9 +64,9 @@
             "groupname": "azure"
         },
         {
-            "name": "connectedServiceNameARM",
+            "name": "ConnectedServiceNameARM",
             "aliases": [
-                "ConnectedServiceNameARM"
+                "connectedServiceNameARM"
             ],
             "type": "connectedService:AzureRM",
             "label": "Service Connection",
@@ -164,9 +164,6 @@
         },
         {
             "name": "tmslFile",
-            "aliases": [
-                "tsmlFile"
-            ],
             "type": "filePath",
             "label": "TMSL File",
             "helpMarkDown": "Location of the TMSL file on the automation agent or on a UNC path accessible to the automation agent like, \\\\BudgetIT\\Web\\Deploy\\Fabrikam.tmsl. Predefined system variables like, $(agent.releaseDirectory) can also be used here",
@@ -175,9 +172,6 @@
         },
         {
             "name": "tmslScript",
-            "aliases": [
-                "tsmlScript"
-            ],
             "type": "multiLine",
             "label": "Inline TMSL Script",
             "helpMarkDown": "Enter the TMSL script to execute on the Azure Analysis Service instance selected above",
@@ -191,6 +185,18 @@
             "helpMarkDown": "Enter the path to a folder with the TMSL script to needs to be execute on the Azure Analysis Services instance selected above",
             "groupname": "query",
             "visibleRule": "queryType = folder"
+        },
+        {
+            "name": "tsmlFile",
+            "type": "filePath",
+            "label": "Old variable containing the TMSL File",
+            "groupname": "advanced"
+        },
+        {
+            "name": "tsmlScript",
+            "type": "multiLine",
+            "label": "Old variable containing the TMSL inline script",
+            "groupname": "advanced"
         },
         {
             "name": "ipDetectionMethod",

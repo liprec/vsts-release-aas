@@ -20,7 +20,7 @@
     "version": {
         "Major": "1",
         "Minor": "5",
-        "Patch": "4"
+        "Patch": "5"
     },
     "minimumAgentVersion": "2.115.0",
     "groups": [
@@ -57,9 +57,9 @@
     ],
     "inputs": [
         {
-            "name": "connectedServiceNameSelector",
+            "name": "ConnectedServiceNameSelector",
             "aliases": [
-                "ConnectedServiceNameSelector"
+                "connectedServiceNameSelector"
             ],
             "type": "pickList",
             "label": "Service Connection Type",
@@ -73,9 +73,9 @@
             "groupname": "azure"
         },
         {
-            "name": "connectedServiceNameARM",
+            "name": "ConnectedServiceNameARM",
             "aliases": [
-                "ConnectedServiceNameARM"
+                "connectedServiceNameARM"
             ],
             "type": "connectedService:AzureRM",
             "label": "Service Connection",
@@ -106,12 +106,15 @@
         },
         {
             "name": "databaseName",
-            "aliases": [
-                "modelName"
-            ],
             "type": "string",
             "label": "Database Name",
             "helpMarkDown": "Name of the Tabular database",
+            "groupname": "aas"
+        },
+        {
+            "name": "modelName",
+            "type": "string",
+            "label": "Old variable containing 'modelName'",
             "groupname": "aas"
         },
         {
