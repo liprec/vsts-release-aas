@@ -36,7 +36,7 @@ if ($connectionType -eq "sql") {
     $sourceSQLServer = Get-VstsInput -Name "sourceSQLServer"
     $sourceSQLDatabase = Get-VstsInput -Name "sourceSQLDatabase"
     $sourceSQLUsername = Get-VstsInput -Name "sourceSQLUsername"
-    $sourceSQLPassword = (Get-VstsInput -Name "sourceSQLPassword" | ForEach-Object { $_.Replace('\', '\\') })
+    $sourceSQLPassword = (Get-VstsInput -Name "sourceSQLPassword" | ForEach-Object { $_.Replace('\', '\\').Replace('''', '\''') })
 }
 
 if ($connectionType -eq "advanced") {
