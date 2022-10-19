@@ -73,7 +73,7 @@ function Get-AgentIpAddress {
         if (($start -gt 24) -and ($length -ge 7)) {
             $startIP = $errMsg.SubString($start, $length)
             # Extra parsing needed due to inconsistend message between datacenters
-            $startIP.Replace("<ip>", "").Replace("</ip>", "")
+            $startIP = $startIP.Replace("<ip>", "").Replace("</ip>", "")
             $endIP = $startIP
         } else {
             throw "Error during detecting agent IP address ($errMsg)"
