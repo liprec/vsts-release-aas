@@ -32,7 +32,7 @@ function Get-AzureRmAnalysisServicesResourceId {
 
     Write-Verbose "Get Resource Groups"
     $method = "GET"
-    $uri = "$($endpoint.Url)/subscriptions/$subscriptionId/resources?api-version=$apiVersion"
+    $uri = "$($endpoint.Url)/subscriptions/$subscriptionId/resources?api-version=$apiVersion&$filter=resourceType eq '$serverType'"
     $headers = @{Authorization = ("{0} {1}" -f $accessToken.token_type, $accessToken.access_token) }
 
     do {

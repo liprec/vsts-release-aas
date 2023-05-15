@@ -129,6 +129,7 @@ switch ($loginType) {
     }
     "inherit" {
         Write-Verbose "Using endpoint credentials"
+
         if ($isPBI) {
             $identifier = ("app:{0}@{1}" -f $endpoint.Auth.parameters.applicationId, $endpoint.Auth.parameters.tenantId)
             $secret = ConvertTo-SecureString -String ($endpoint.Auth.parameters.clientSecret) -AsPlainText -Force
