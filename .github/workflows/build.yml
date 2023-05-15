@@ -9,7 +9,7 @@ jobs:
     name: Build, test and pack tasks
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: install tfx-cli
         run: |
           npm install tfx-cli
@@ -24,10 +24,10 @@ jobs:
         if: ${{ endsWith(github.ref, 'main') }}
         id: extract_version
         run: |
-          node -e "const v = require('.\\vss-extension.json').version;console.log('::set-output name=version::' + v);"
+          node -e "const v = require('.\\vss-extension.json').version;console.log('version=' + v);" >> $GITHUB_OUTPUT
       - name: store extension - production version
         if: ${{ endsWith(github.ref, 'main') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: liprec.vsts-release-aas-${{ steps.extract_version.outputs.version }}
           path: |
@@ -41,10 +41,10 @@ jobs:
         if: ${{ endsWith(github.ref, 'develop') }}
         id: extract_version_preview
         run: |
-          node -e "const v = require('.\\vss-extension-preview.json').version;console.log('::set-output name=version::' + v);"
+          node -e "const v = require('.\\vss-extension-preview.json').version;console.log('version=' + v);" >> $GITHUB_OUTPUT
       - name: store extension - preview version
         if: ${{ endsWith(github.ref, 'develop') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: liprec.vsts-release-aas-preview-${{ steps.extract_version_preview.outputs.version }}
           path: |
