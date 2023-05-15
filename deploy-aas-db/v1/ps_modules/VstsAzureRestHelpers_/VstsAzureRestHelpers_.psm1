@@ -416,7 +416,7 @@ function Get-SpnAccessTokenUsingCertificate {
     Write-Verbose "Fetching access token using client certificate."
     
     # load the ADAL library 
-    Add-Type -Path $PSScriptRoot/../../assemblies/Microsoft.Identity.Client.dll
+    Add-Type -Path $PSScriptRoot\Microsoft.IdentityModel.Clients.ActiveDirectory.dll
 
     $pemFileContent = $endpoint.Auth.Parameters.ServicePrincipalCertificate
     $pfxFilePath, $pfxFilePassword = ConvertTo-Pfx -pemFileContent $pemFileContent
@@ -453,14 +453,6 @@ function Get-SpnAccessTokenUsingCertificate {
         $validateAuthority = -not $isADFSEnabled
         $authenticationContext = New-Object Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext -ArgumentList $authorityUrl, $validateAuthority
         $tokenResult = $authenticationContext.AcquireTokenAsync($azureActiveDirectoryResourceId, $clientAssertionCertificate).ConfigureAwait($false).GetAwaiter().GetResult()
-
-
-        $app = Microsoft.Identity.Clients.ConfidentialClientApplicationBuilder
-            .Create($servicePrincipalId)
-            .WithCertificate($clientCertificate)
-            .WithAuthority($authorityUrl, $validateAuthority).Build();
-
-        $tokenResult = $app.AcquireTokenForClient({ "$azureActiveDirectoryResourceId/.default" }).ExecuteAsync().ConfigureAwait($false);
     }
     catch {
         $script:certificateAccessToken = $null
@@ -1167,7 +1159,7 @@ function ConvertTo-Pfx {
     $pfxFilePassword = [System.Guid]::NewGuid().ToString()
     Set-Content -Path $pfxPasswordFilePath -Value $pfxFilePassword -NoNewline
 
-    $openSSLExePath = "$PSScriptRoot\..\..\openssl\openssl.exe"
+    $openSSLExePath = "$PSScriptRoot\openssl\openssl.exe"
     $openSSLArgs = "pkcs12 -export -in $pemFilePath -out $pfxFilePath -password file:`"$pfxPasswordFilePath`""
      
     Invoke-VstsTool -FileName $openSSLExePath -Arguments $openSSLArgs -RequireExitCodeZero

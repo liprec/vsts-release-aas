@@ -129,15 +129,13 @@ switch ($loginType) {
     }
     "inherit" {
         Write-Verbose "Using endpoint credentials"
-        $thumbPrint = "19FE1B1F7AAE094FEAD0E8D522EEEFADB7C9F64A"
 
         if ($isPBI) {
             $identifier = ("app:{0}@{1}" -f $endpoint.Auth.parameters.applicationId, $endpoint.Auth.parameters.tenantId)
             $secret = ConvertTo-SecureString -String ($endpoint.Auth.parameters.clientSecret) -AsPlainText -Force
         } else {
             $identifier = ("app:{0}@{1}" -f $endpoint.Auth.parameters.ServicePrincipalId, $endpoint.Auth.parameters.TenantId)
-            #$secret = ConvertTo-SecureString -String ($endpoint.Auth.Parameters.ServicePrincipalKey) -AsPlainText -Force
-            $secret = ConvertTo-SecureString -String ($thumbPrint) -AsPlainText -Force
+            $secret = ConvertTo-SecureString -String ($endpoint.Auth.Parameters.ServicePrincipalKey) -AsPlainText -Force
         }
     }
 }
