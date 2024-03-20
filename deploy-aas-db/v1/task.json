@@ -309,7 +309,7 @@
             "name": "overwrite",
             "type": "boolean",
             "label": "Overwrite",
-            "defaultValue": "true",
+            "defaultValue": "false",
             "required": false,
             "helpMarkDown": "[DEPRECATED] Not used anymore",
             "groupName": "old"
